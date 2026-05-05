@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#081225" />
+    <title>Cyberwolf Control Room</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section id="joinCard" class="panel join-panel">
+        <p class="kicker">Realtime Multiplayer Game</p>
+        <h1>Cyberwolf: Breach Protocol</h1>
+        <p class="subtitle">Masuk room, dapat role rahasia, lalu menangkan duel antara tim Security vs Malware.</p>
+        <div class="join-form">
+          <label for="username">Nama Agent</label>
+          <input id="username" placeholder="Contoh: RedHAt" maxlength="20" />
+          <p class="field-note">Dipakai sebagai nama tampilan saat diskusi dan voting.</p>
+
+          <label for="roomCode">Token Room (untuk join manual)</label>
+          <input id="roomCode" placeholder="Contoh: AB12CD" maxlength="16" />
+          <p class="field-note">Isi token jika ingin masuk room tertentu secara langsung.</p>
+
+          <button id="createBtn">Buat Room Otomatis</button>
+          <button id="joinBtn" class="btn-muted">Join dengan Token</button>
+        </div>
+        <div class="quick-guide lobby-section">
+          <h3>&#x1F7E2; Lobby Aktif</h3>
+          <p class="field-note">Room yang sedang menunggu pemain. Klik Join untuk bergabung.</p>
+          <ul id="publicLobbyList" class="players lobby-list"></ul>
+        </div>
+        <div class="quick-guide history-section">
+          <h3>&#x1F4DC; Riwayat Permainan</h3>
+          <p class="field-note">Game yang sudah selesai. Lihat siapa yang menang.</p>
+          <ul id="historyList" class="players lobby-list"></ul>
+        </div>
+        <div class="quick-guide">
+          <h3>Cara Main Singkat</h3>
+          <p>1. Join room yang sama.</p>
+          <p>2. Pembuat room klik mulai saat pemain cukup.</p>
+          <p>3. Siang: diskusi dan voting.</p>
+          <p>4. Malam: role khusus pakai skill.</p>
+        </div>
+      </section>
+
+      <section id="gameCard" class="panel hidden">
+        <div class="hero">
+          <div class="hero-profile">
+            <div id="roleAvatarContainer" class="role-avatar-container">
+              <span id="roleAvatarIcon"></span>
+            </div>
+            <div>
+              <p id="roomLabel" class="room-tag"></p>
+              <h2 id="meLabel"></h2>
+              <p id="roleDesc" class="role-desc"></p>
+              <p id="missionHint" class="subtitle"></p>
+            </div>
+          </div>
+          <div class="phase-badge">
+            <p id="phaseLabel"></p>
+            <p id="timerLabel"></p>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <button id="startBtn" class="btn-muted">Mulai Game</button>
+          <button id="addBotBtn" class="btn-muted">&#x1F916; Tambah Bot</button>
+          <button id="dissolveBtn" class="btn-muted">Bubar Lobby</button>
+          <button id="leaveBtn" class="btn-muted">Keluar Lobby</button>
+          <button id="copyRoomBtn" class="btn-muted">Salin Token</button>
+          <button id="helpBtn" class="btn-muted">Panduan Role</button>
+        </div>
+
+        <div class="game-grid">
+          <!-- LOBBY ONLY -->
+          <article id="setupCard" class="panel-block lobby-only">
+            <h3>Game Setup (Creator)</h3>
+            <p class="small-text">Atur durasi voting siang dan komposisi role sebelum game dimulai.</p>
+            <label for="setupVisibility">Akses Lobby</label>
+            <select id="setupVisibility">
+              <option value="public">&#x1F310; Public Lobby</option>
+              <option value="private">&#x1F512; Private Lobby</option>
+            </select>
+            <p class="field-note">Public tampil di landing page, private hanya bisa join via token.</p>
+
+            <label for="dayMinutesInput">Durasi Voting Siang</label>
+            <select id="dayMinutesInput">
+              <option value="1">&#x23F1;&#xFE0F; 1 menit</option>
+              <option value="2">&#x23F1;&#xFE0F; 2 menit</option>
+              <option value="3">&#x23F1;&#xFE0F; 3 menit</option>
+              <option value="4">&#x23F1;&#xFE0F; 4 menit</option>
+              <option value="5">&#x23F1;&#xFE0F; 5 menit</option>
+              <option value="6">&#x23F1;&#xFE0F; 6 menit</option>
+              <option value="7">&#x23F1;&#xFE0F; 7 menit</option>
+              <option value="8">&#x23F1;&#xFE0F; 8 menit</option>
+              <option value="9">&#x23F1;&#xFE0F; 9 menit</option>
+              <option value="10">&#x23F1;&#xFE0F; 10 menit</option>
+              <option value="12">&#x23F1;&#xFE0F; 12 menit</option>
+              <option value="15">&#x23F1;&#xFE0F; 15 menit</option>
+            </select>
+            <p class="field-note">Default saat room dibuat: 5 menit.</p>
+
+            <label for="roleMalwareInput">Jumlah Role &#x1F9A0; Malware</label>
+            <select id="roleMalwareInput"></select>
+            <label for="roleAnalystInput">Jumlah Role &#x1F575;&#xFE0F; Analyst</label>
+            <select id="roleAnalystInput"></select>
+            <label for="roleDefenderInput">Jumlah Role &#x1F6E1;&#xFE0F; Defender</label>
+            <select id="roleDefenderInput"></select>
+            <label for="roleLogicbombInput">Jumlah Role &#x1F4A3; Logic Bomb</label>
+            <select id="roleLogicbombInput"></select>
+            <label for="roleSysadminInput">Jumlah Role &#x1F9D1;&#x200D;&#x1F4BB; System Admin</label>
+            <select id="roleSysadminInput"></select>
+            <label for="roleUserInput">Jumlah Role &#x1F642; Regular User</label>
+            <select id="roleUserInput"></select>
+            <p class="field-note">Jumlah Malware otomatis disesuaikan: 1 jika &lt;8 pemain, 2 jika 8 pemain.</p>
+            <button id="saveSetupBtn" class="btn-muted">Simpan Setting</button>
+          </article>
+
+          <!-- Daftar Agent (always visible) -->
+          <article class="panel-block">
+            <h3>Daftar Agent</h3>
+            <ul id="players" class="players"></ul>
+          </article>
+
+          <!-- INGAME ONLY: Role & Avatar -->
+          <article id="roleArticle" class="panel-block ingame-only">
+            <h3>Role Kamu</h3>
+            <div class="role-display-box">
+              <div id="idleAvatar" class="idle-avatar"></div>
+            </div>
+          </article>
+
+          <!-- INGAME ONLY: Action Panel -->
+          <article id="actionArticle" class="panel-block ingame-only">
+            <h3>Tentukan Pilihanmu</h3>
+            <p id="actionHelp" class="small-text"></p>
+            <label id="targetLabel" class="target-label">&#x1F3AF; Pilih Target</label>
+            <!-- Custom card-based target picker (replaces plain select) -->
+            <div id="targetList" class="target-card-list"></div>
+            <!-- Hidden select kept for backward compatibility -->
+            <select id="targetSelect" class="hidden"></select>
+            <div class="action-stack">
+              <button id="voteBtn">Kirim Voting Siang</button>
+              <button id="roleActionBtn" class="btn-muted">Pakai Skill Role</button>
+              <button id="sysSaveBtn" class="btn-muted">Restore (1x)</button>
+              <button id="sysKillBtn" class="btn-muted">Force Delete (1x)</button>
+            </div>
+          </article>
+
+          <!-- Chat (always visible) -->
+          <article class="panel-block">
+            <h3>Chat Operasi</h3>
+            <div id="chatBox" class="feed"></div>
+            <div class="chat-input">
+              <label for="chatInput" class="hidden">Pesan Chat</label>
+              <input id="chatInput" placeholder="Ketik pesan untuk tim..." maxlength="240" />
+              <button id="sendChatBtn">Kirim</button>
+            </div>
+            <p class="field-note">Maksimal 240 karakter per pesan.</p>
+          </article>
+        </div>
+
+        <article class="panel-block full-width">
+          <h3>Status Operasi</h3>
+          <p class="small-text">Pantau progres ronde saat ini tanpa spam log event.</p>
+          <ul id="statusList" class="players"></ul>
+        </article>
+      </section>
+    </main>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal hidden">
+      <div class="modal-card">
+        <h3>Panduan Role Cyberwolf</h3>
+        <p><strong>&#x1F9A0; Malware:</strong> Pilih 1 target tiap malam untuk diinfeksi.</p>
+        <p><strong>&#x1F575;&#xFE0F; Security Analyst:</strong> Scan 1 target tiap malam, tahu dia Malware atau bukan.</p>
+        <p><strong>&#x1F6E1;&#xFE0F; Firewall:</strong> Lindungi 1 target tiap malam dari serangan Malware.</p>
+        <p><strong>&#x1F9D1;&#x200D;&#x1F4BB; System Admin:</strong> Punya 1x Restore dan 1x Force Delete.</p>
+        <p><strong>&#x1F4A3; Logic Bomb:</strong> Jika mati, bisa bawa 1 pemain ikut terhapus.</p>
+        <p><strong>&#x1F642; Regular User:</strong> Fokus diskusi, cari pelaku, dan voting dengan tepat.</p>
+        <button id="closeHelpBtn">Tutup</button>
+      </div>
+    </div>
+
+    <!-- Role Reveal Modal -->
+    <div id="roleRevealModal" class="reveal-modal hidden">
+      <div class="reveal-card">
+        <div class="reveal-card-inner">
+          <div class="reveal-card-front">
+            <div class="card-logo">&#x1F43A;</div>
+          </div>
+          <div class="reveal-card-back">
+            <h2 id="revealRoleName">Role Name</h2>
+            <div id="revealRoleIcon" class="reveal-icon"></div>
+            <p id="revealRoleDesc">Role Description</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase Transition Overlay -->
+    <div id="phaseTransitionOverlay" class="phase-transition hidden">
+      <h1 id="phaseTransitionText">Malam Telah Tiba</h1>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div id="gameOverOverlay" class="game-over-overlay hidden">
+      <div class="game-over-card">
+        <div id="gameOverIcon" class="game-over-icon"></div>
+        <h1 id="gameOverTitle">Game Over</h1>
+        <p id="gameOverDesc" class="game-over-desc"></p>
+        <button id="gameOverBtn" class="game-over-btn">&#x1F504; Kembali ke Lobby</button>
+      </div>
+    </div>
+
+    <!-- 3 Music Themes (local files) -->
+    <!-- Lobby: Lo-fi calm ambient -->
+    <audio id="bgMusicLobby" loop preload="auto">
+      <source src="/audio/lobby.mp3" type="audio/mpeg">
+    </audio>
+    <!-- Day: Mysterious ambient piano -->
+    <audio id="bgMusicDay" loop preload="auto">
+      <source src="/audio/day.mp3" type="audio/mpeg">
+    </audio>
+    <!-- Night: Dark horror ambient -->
+    <audio id="bgMusicNight" loop preload="auto">
+      <source src="/audio/night.mp3" type="audio/mpeg">
+    </audio>
+    <button id="muteToggle" class="mute-btn">&#x1F50A;</button>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
