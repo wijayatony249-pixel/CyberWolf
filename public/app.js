@@ -90,6 +90,7 @@ let state = null;
 let timerInterval = null;
 let publicLobbies = [];
 let hasRevealedRoleThisGame = false;
+let hasShownGameOverThisGame = false;
 let selectedPlayerId = null; // tracks selected card in custom target picker
 
 const ROLE_EMOJIS = {
@@ -592,9 +593,19 @@ function renderState(nextState) {
 
     // Game Over Screen
     if (nextState.phase === 'ended') {
-      const winner = nextState.winner || 'security';
-      setTimeout(() => showGameOver(winner), 1200);
+      if (!hasShownGameOverThisGame) {
+        hasShownGameOverThisGame = true;
+        const winner = nextState.winner || 'security';
+        setTimeout(() => showGameOver(winner), 1200);
+      }
+    } else {
+      hasShownGameOverThisGame = false;
     }
+  } else if (nextState.phase === 'ended' && !hasShownGameOverThisGame) {
+    // Failsafe for refresh: if we are in 'ended' phase but haven't shown it yet
+    hasShownGameOverThisGame = true;
+    const winner = nextState.winner || 'security';
+    showGameOver(winner);
   }
 
   // Lobby vs In-Game panel separation
