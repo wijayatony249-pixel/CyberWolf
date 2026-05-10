@@ -376,11 +376,6 @@ gameOverBtn.onclick = () => backToLanding();
 // populateRoleSelect removed - no longer needed
 
 
-function initSetupSelects() {
-  [roleMalwareInput, roleAnalystInput, roleDefenderInput, roleLogicbombInput, roleSysadminInput, roleUserInput].forEach((el) =>
-    populateRoleSelect(el)
-  );
-}
 
 function appendBox(el, text) {
   const p = document.createElement('p');
@@ -966,7 +961,6 @@ async function fetchHistory() {
   }
 }
 
-initSetupSelects();
 renderPublicLobbies();
 fetchHistory(); // load history from Supabase on startup
 // Refresh history every 30 seconds

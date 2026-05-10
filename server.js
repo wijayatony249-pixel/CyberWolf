@@ -316,6 +316,10 @@ function eliminatePlayer(room, targetId, reason) {
       io.to(target.id).emit('action:logicbomb:available');
     }
   }
+
+  // Ensure win condition is checked whenever someone is eliminated
+  checkWinCondition(room);
+
   return target;
 }
 
