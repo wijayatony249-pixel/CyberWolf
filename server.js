@@ -36,7 +36,7 @@ async function saveGameHistory(room) {
 
 const CONFIG = {
   minPlayers: 6,
-  maxPlayers: 8,
+  maxPlayers: 12,
   dayDurationSec: 60,
   nightDurationSec: 15,
 };
@@ -547,8 +547,10 @@ function assignRoles(room) {
   const allPlayers = [...room.players.values()];
   const total = allPlayers.length;
 
-  // Auto-balance Malware count
-  room.settings.roleCount.malware = (total >= 8) ? 2 : 1;
+  // Auto-balance Malware count if set to 0 (default fallback)
+  if (total >= 10) room.settings.roleCount.malware = 3;
+  else if (total >= 8) room.settings.roleCount.malware = 2;
+  else room.settings.roleCount.malware = 1;
 
   const dynamicPool = buildRolePool(room.settings, total);
 

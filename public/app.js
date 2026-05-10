@@ -162,7 +162,7 @@ gameOverBtn.onclick = () => backToLanding();
 
 function populateRoleSelect(selectEl) {
   selectEl.innerHTML = '';
-  for (let i = 0; i <= 8; i += 1) {
+  for (let i = 0; i <= 12; i += 1) {
     const opt = document.createElement('option');
     opt.value = String(i);
     opt.textContent = `🎯 ${i} pemain`;
