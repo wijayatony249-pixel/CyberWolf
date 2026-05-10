@@ -215,98 +215,89 @@ function backToLanding() {
 }
 
 function showGameOver(winner) {
-  // winner: 'malware' or 'security'
-  stopAllMusic();
-  const isMalwareWin = winner === 'malware';
-  const myRole = (state && state.me) ? state.me.role : null;
-  const isIMalware = (myRole === 'malware');
+  try {
+    // winner: 'malware' or 'security'
+    stopAllMusic();
+    const isMalwareWin = winner === 'malware';
+    const myRole = (state && state.me) ? state.me.role : 'user';
+    const isIMalware = (myRole === 'malware');
 
-  if (isMalwareWin) {
-    if (isIMalware) {
-      // I am Malware and I won
-      triggerMalwareSuccessScene();
+    console.log("Game Over Triggered. Winner:", winner, "My Role:", myRole);
+
+    if (isMalwareWin) {
+      if (isIMalware) triggerMalwareSuccessScene();
+      else triggerMalwareVictoryScene();
     } else {
-      // I am Good Guy and I lost (system crash)
-      triggerMalwareVictoryScene();
+      if (isIMalware) triggerMalwareDeletedScene();
+      else triggerSecurityVictoryScene();
     }
-  } else {
-    // Security Win
-    if (isIMalware) {
-      // I am Malware and I lost (being deleted)
-      triggerMalwareDeletedScene();
-    } else {
-      // I am Good Guy and I won (system restore)
-      triggerSecurityVictoryScene();
+
+    if (gameOverOverlay) {
+      gameOverOverlay.classList.remove('hidden');
+      gameOverOverlay.className = `game-over-overlay ${isMalwareWin ? 'malware-wins' : 'security-wins'}`;
+      if (gameOverIcon) gameOverIcon.textContent = isMalwareWin ? '🦠' : '🛡️';
+      if (gameOverTitle) gameOverTitle.textContent = isMalwareWin ? '🚨 Malware Menang!' : '✅ Malware Telah Dikalahkan!';
+      if (gameOverDesc) gameOverDesc.textContent = isMalwareWin 
+        ? 'Malware berhasil mengeliminasi seluruh tim Security. Sistem telah dikompromikan sepenuhnya.' 
+        : 'Tim Security berhasil memberantas semua Malware. Jaringan aman kembali!';
     }
+  } catch (err) {
+    console.error("Error showing game over:", err);
   }
-
-  gameOverOverlay.className = `game-over-overlay ${isMalwareWin ? 'malware-wins' : 'security-wins'}`;
-  gameOverIcon.textContent = isMalwareWin ? '🦠' : '🛡️';
-  gameOverTitle.textContent = isMalwareWin
-    ? '🚨 Malware Menang!'
-    : '✅ Malware Telah Dikalahkan!';
-  gameOverDesc.textContent = isMalwareWin
-    ? 'Malware berhasil mengeliminasi seluruh tim Security. Sistem telah dikompromikan sepenuhnya.'
-    : 'Tim Security berhasil memberantas semua Malware. Jaringan aman kembali!';
 }
 
 function triggerSecurityVictoryScene() {
-  if (!securityWinScene) return;
-  securityWinScene.classList.remove('hidden');
-  purgeTerminal.classList.remove('hidden');
-  purgeTerminal.innerHTML = '';
-  hologramShield.classList.add('hidden');
+  try {
+    if (!securityWinScene) return;
+    securityWinScene.classList.remove('hidden');
+    if (purgeTerminal) {
+      purgeTerminal.classList.remove('hidden');
+      purgeTerminal.innerHTML = '';
+    }
+    if (hologramShield) hologramShield.classList.add('hidden');
 
-  // Play victory sound
-  if (sfxSuccess) {
-    sfxSuccess.volume = 0.6;
-    sfxSuccess.play().catch(e => console.log('Success SFX blocked:', e));
-  }
-
-  const logs = [
-    "[INIT] System integrity check starting...",
-    "[SCAN] Deep scanning core kernel...",
-    "[WARN] Foreign payload detected in /sys/temp/malware.exe",
-    "[PURGE] Deleting suspicious processes...",
-    "[SCAN] Checking user permissions...",
-    "[INFO] Restoring firewall rules...",
-    "[INFO] Flushing compromised cache...",
-    "[SCAN] Validating system digital signatures...",
-    "[OK] All 🦠 Malware nodes eliminated.",
-    "[INIT] Rebooting secure subsystem...",
-    "[DONE] SYSTEM INTEGRITY: 100%"
-  ];
-
-  let i = 0;
-  const logInterval = setInterval(() => {
-    if (i >= logs.length) {
-      clearInterval(logInterval);
-      setTimeout(() => {
-        purgeTerminal.classList.add('hidden');
-        hologramShield.classList.remove('hidden');
-      }, 1000);
-      return;
+    if (sfxSuccess) {
+      sfxSuccess.volume = 0.6;
+      sfxSuccess.play().catch(e => console.log('Success SFX blocked'));
     }
 
-    const p = document.createElement('p');
-    p.className = 'purge-line';
-    p.textContent = logs[i];
-    purgeTerminal.appendChild(p);
-    purgeTerminal.scrollTop = purgeTerminal.scrollHeight;
-    i++;
-  }, 400);
+    const logs = [
+      "[INIT] System integrity check starting...",
+      "[SCAN] Deep scanning core kernel...",
+      "[WARN] Foreign payload detected in /sys/temp/malware.exe",
+      "[PURGE] Deleting suspicious processes...",
+      "[INFO] Restoring firewall rules...",
+      "[INFO] Flushing compromised cache...",
+      "[OK] All 🦠 Malware nodes eliminated.",
+      "[DONE] SYSTEM INTEGRITY: 100%"
+    ];
+
+    let i = 0;
+    const logInterval = setInterval(() => {
+      if (!purgeTerminal || i >= logs.length) {
+        clearInterval(logInterval);
+        setTimeout(() => {
+          if (purgeTerminal) purgeTerminal.classList.add('hidden');
+          if (hologramShield) hologramShield.classList.remove('hidden');
+        }, 800);
+        return;
+      }
+      const p = document.createElement('p');
+      p.className = 'purge-line';
+      p.textContent = logs[i];
+      purgeTerminal.appendChild(p);
+      purgeTerminal.scrollTop = purgeTerminal.scrollHeight;
+      i++;
+    }, 350);
+  } catch (e) { console.error(e); }
 }
 
 function triggerMalwareSuccessScene() {
-  if (!malwareSuccessScene) return;
-  malwareSuccessScene.classList.remove('hidden');
-  // Futuristic red theme music or effect
+  if (malwareSuccessScene) malwareSuccessScene.classList.remove('hidden');
 }
 
 function triggerMalwareDeletedScene() {
-  if (!malwareDeletedScene) return;
-  malwareDeletedScene.classList.remove('hidden');
-  // Optional: Play a "dissolving" or "glitch" sound
+  if (malwareDeletedScene) malwareDeletedScene.classList.remove('hidden');
 }
 
 function triggerMalwareVictoryScene() {
