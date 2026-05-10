@@ -243,6 +243,7 @@ function showGameOver(winner) {
 
     console.log("Game Over Triggered. Winner:", winner, "My Role:", myRole);
 
+    // Initial sequence trigger
     if (isMalwareWin) {
       if (isIMalware) triggerMalwareSuccessScene();
       else triggerMalwareVictoryScene();
@@ -251,15 +252,23 @@ function showGameOver(winner) {
       else triggerSecurityVictoryScene();
     }
 
-    if (gameOverOverlay) {
-      gameOverOverlay.classList.remove('hidden');
-      gameOverOverlay.className = `game-over-overlay ${isMalwareWin ? 'malware-wins' : 'security-wins'}`;
-      if (gameOverIcon) gameOverIcon.textContent = isMalwareWin ? '🦠' : '🛡️';
-      if (gameOverTitle) gameOverTitle.textContent = isMalwareWin ? '🚨 Malware Menang!' : '✅ Malware Telah Dikalahkan!';
-      if (gameOverDesc) gameOverDesc.textContent = isMalwareWin 
-        ? 'Malware berhasil mengeliminasi seluruh tim Security. Sistem telah dikompromikan sepenuhnya.' 
-        : 'Tim Security berhasil memberantas semua Malware. Jaringan aman kembali!';
-    }
+    // Delay the final "Malware Menang!" / "Security Menang!" modal
+    // so background animations (XP errors, Purge terminal, etc.) can run first.
+    // We delay by 6-8 seconds to allow the sequence to feel premium.
+    const modalDelay = isMalwareWin ? 7500 : 4000;
+
+    setTimeout(() => {
+      if (gameOverOverlay) {
+        gameOverOverlay.classList.remove('hidden');
+        gameOverOverlay.className = `game-over-overlay ${isMalwareWin ? 'malware-wins' : 'security-wins'}`;
+        if (gameOverIcon) gameOverIcon.textContent = isMalwareWin ? '🦠' : '🛡️';
+        if (gameOverTitle) gameOverTitle.textContent = isMalwareWin ? '🚨 Malware Menang!' : '✅ Malware Telah Dikalahkan!';
+        if (gameOverDesc) gameOverDesc.textContent = isMalwareWin 
+          ? 'Malware berhasil mengeliminasi seluruh tim Security. Sistem telah dikompromikan sepenuhnya.' 
+          : 'Tim Security berhasil memberantas semua Malware. Jaringan aman kembali!';
+      }
+    }, modalDelay);
+
   } catch (err) {
     console.error("Error showing game over:", err);
   }

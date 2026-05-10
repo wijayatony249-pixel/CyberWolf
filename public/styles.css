@@ -1511,8 +1511,25 @@ button:disabled {
 }
 
 @keyframes screenDim {
-  from { background-size: 100% 100%; }
-  to { background-size: 200% 200%; }
+  to { background: #000; }
+}
+
+/* Optional: Hide ingame panels during lobby or game-over */
+.ingame-only {
+  display: none !important;
+}
+
+.game-started .ingame-only {
+  display: block !important;
+}
+
+/* Ensure phase transition overlay has proper display */
+.phase-transition.hidden {
+  display: none !important;
+}
+
+.phase-transition:not(.hidden) {
+  display: flex !important;
 }
 
 .glitch-text {
