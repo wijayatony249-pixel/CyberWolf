@@ -65,6 +65,7 @@ const roleDefenderInput = document.getElementById('roleDefenderInput');
 const roleLogicbombInput = document.getElementById('roleLogicbombInput');
 const roleSysadminInput = document.getElementById('roleSysadminInput');
 const roleUserInput = document.getElementById('roleUserInput');
+const maxPlayersInput = document.getElementById('maxPlayersInput');
 const saveSetupBtn = document.getElementById('saveSetupBtn');
 
 const chatBox = document.getElementById('chatBox');
@@ -621,6 +622,7 @@ function renderState(nextState) {
     setupVisibility.value = state.settings.visibility || 'public';
     if (dayMinutesInput) dayMinutesInput.value = String(Math.round((state.settings.dayDurationSec || 300) / 60) || 5);
     if (nightSecondsInput) nightSecondsInput.value = String(state.settings.nightDurationSec || 15);
+    if (maxPlayersInput) maxPlayersInput.value = String(state.settings.maxPlayers || 12);
     roleMalwareInput.value = String(state.settings.roleCount?.malware ?? 2);
     roleAnalystInput.value = String(state.settings.roleCount?.analyst ?? 1);
     roleDefenderInput.value = String(state.settings.roleCount?.defender ?? 1);
@@ -644,12 +646,14 @@ createBtn.onclick = () => {
   attemptPlayMusic();
   const dayMinutes = Number(dayMinutesInput.value || 5);
   const nightSeconds = Number(nightSecondsInput.value || 15);
+  const maxPlayers = Number(maxPlayersInput.value || 12);
   socket.emit('room:create', {
     username: usernameInput.value,
     settings: {
       visibility: setupVisibility.value,
       dayDurationSec: Math.round(dayMinutes * 60),
       nightDurationSec: nightSeconds,
+      maxPlayers: maxPlayers,
       roleCount: {
         malware: Number(roleMalwareInput.value || 0),
         analyst: Number(roleAnalystInput.value || 0),

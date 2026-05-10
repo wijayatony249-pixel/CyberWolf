@@ -93,6 +93,7 @@ function createRoom(roomCode) {
     settings: {
       dayDurationSec: CONFIG.dayDurationSec,
       nightDurationSec: CONFIG.nightDurationSec,
+      maxPlayers: CONFIG.maxPlayers,
       visibility: 'public',
       roleCount: {
         malware: 2,
@@ -112,6 +113,7 @@ function normalizeRoomSettings(raw) {
   const defaultSettings = {
     dayDurationSec: CONFIG.dayDurationSec,
     nightDurationSec: CONFIG.nightDurationSec,
+    maxPlayers: CONFIG.maxPlayers,
     visibility: 'public',
     roleCount: {
       malware: 2,
@@ -127,6 +129,7 @@ function normalizeRoomSettings(raw) {
   const parsed = {
     dayDurationSec: Math.max(30, Math.min(900, Number(next.dayDurationSec) || defaultSettings.dayDurationSec)),
     nightDurationSec: Math.max(15, Math.min(300, Number(next.nightDurationSec) || defaultSettings.nightDurationSec)),
+    maxPlayers: Math.max(CONFIG.minPlayers, Math.min(CONFIG.maxPlayers, Number(next.maxPlayers) || defaultSettings.maxPlayers)),
     visibility: String(next.visibility || defaultSettings.visibility) === 'private' ? 'private' : 'public',
     roleCount: {
       malware: Math.max(0, Math.floor(Number(roleCount.malware) || defaultSettings.roleCount.malware)),
@@ -760,8 +763,8 @@ io.on('connection', (socket) => {
       return;
     }
 
-    if (room.players.size >= CONFIG.maxPlayers) {
-      socket.emit('error:message', `Room penuh (maksimal ${CONFIG.maxPlayers} pemain).`);
+    if (room.players.size >= room.settings.maxPlayers) {
+      socket.emit('error:message', `Room penuh (maksimal ${room.settings.maxPlayers} pemain).`);
       return;
     }
 
@@ -806,8 +809,8 @@ io.on('connection', (socket) => {
       return;
     }
 
-    if (room.players.size >= CONFIG.maxPlayers) {
-      socket.emit('error:message', `Room penuh (maksimal ${CONFIG.maxPlayers} pemain). Tidak bisa menambah bot.`);
+    if (room.players.size >= room.settings.maxPlayers) {
+      socket.emit('error:message', `Room penuh (maksimal ${room.settings.maxPlayers} pemain). Tidak bisa menambah bot.`);
       return;
     }
 

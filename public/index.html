@@ -32,7 +32,20 @@
         <details class="quick-guide setup-details">
           <summary style="cursor:pointer; font-weight:bold; margin-bottom: 8px;">⚙️ Setting Game (Khusus Buat Room)</summary>
           <div id="setupCard" class="setup-card">
-            <p class="small-text">Atur durasi voting dan komposisi role sebelum game dimulai. Game mendukung 6 hingga 12 pemain.</p>
+            <p class="small-text">Atur kapasitas room, durasi voting, dan komposisi role sebelum game dimulai.</p>
+            
+            <label for="maxPlayersInput">Kapasitas Maksimal Pemain</label>
+            <select id="maxPlayersInput">
+              <option value="6">👥 6 Pemain</option>
+              <option value="7">👥 7 Pemain</option>
+              <option value="8">👥 8 Pemain</option>
+              <option value="9">👥 9 Pemain</option>
+              <option value="10">👥 10 Pemain</option>
+              <option value="11">👥 11 Pemain</option>
+              <option value="12" selected>👥 12 Pemain</option>
+            </select>
+            <p class="field-note">Jumlah pemain yang bisa bergabung ke room ini.</p>
+
             <label for="setupVisibility">Akses Lobby</label>
             <select id="setupVisibility">
               <option value="public">🌐 Public Lobby</option>
