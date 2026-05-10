@@ -60,7 +60,7 @@
               <option value="2">⏱️ 2 menit</option>
               <option value="3">⏱️ 3 menit</option>
               <option value="4">⏱️ 4 menit</option>
-              <option value="5">⏱️ 5 menit</option>
+              <option value="5" selected>⏱️ 5 menit</option>
               <option value="6">⏱️ 6 menit</option>
               <option value="7">⏱️ 7 menit</option>
               <option value="8">⏱️ 8 menit</option>
@@ -73,7 +73,7 @@
 
             <label for="nightSecondsInput">Durasi Aksi Malam</label>
             <select id="nightSecondsInput">
-              <option value="15">🌙 15 detik</option>
+              <option value="15" selected>🌙 15 detik</option>
               <option value="30">🌙 30 detik</option>
               <option value="45">🌙 45 detik</option>
               <option value="60">🌙 1 menit</option>
@@ -81,20 +81,8 @@
               <option value="120">🌙 2 menit</option>
             </select>
             <p class="field-note">Default saat room dibuat: 15 detik.</p>
-
-            <label for="roleMalwareInput">Jumlah Role 🦠 Malware</label>
-            <select id="roleMalwareInput"></select>
-            <label for="roleAnalystInput">Jumlah Role 🕵️ Analyst</label>
-            <select id="roleAnalystInput"></select>
-            <label for="roleDefenderInput">Jumlah Role 🛡️ Defender</label>
-            <select id="roleDefenderInput"></select>
-            <label for="roleLogicbombInput">Jumlah Role 💣 Logic Bomb</label>
-            <select id="roleLogicbombInput"></select>
-            <label for="roleSysadminInput">Jumlah Role 🧑‍💻 System Admin</label>
-            <select id="roleSysadminInput"></select>
-            <label for="roleUserInput">Jumlah Role 🙂 Regular User</label>
-            <select id="roleUserInput"></select>
-            <p class="field-note">Jumlah Malware otomatis disesuaikan jika setting ini dibiarkan 0.</p>
+            
+            <p class="field-note" style="margin-top:12px; color:var(--accent);">ℹ️ Komposisi role akan diatur otomatis secara seimbang oleh sistem.</p>
           </div>
         </details>
         <div class="quick-guide lobby-section">

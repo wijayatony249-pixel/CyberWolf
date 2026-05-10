@@ -95,14 +95,6 @@ function createRoom(roomCode) {
       nightDurationSec: CONFIG.nightDurationSec,
       maxPlayers: CONFIG.maxPlayers,
       visibility: 'public',
-      roleCount: {
-        malware: 2,
-        analyst: 1,
-        defender: 1,
-        logicbomb: 1,
-        sysadmin: 1,
-        user: 0,
-      },
     },
     timer: null,
     phaseEndsAt: null,
@@ -115,64 +107,15 @@ function normalizeRoomSettings(raw) {
     nightDurationSec: CONFIG.nightDurationSec,
     maxPlayers: CONFIG.maxPlayers,
     visibility: 'public',
-    roleCount: {
-      malware: 2,
-      analyst: 1,
-      defender: 1,
-      logicbomb: 1,
-      sysadmin: 1,
-      user: 0,
-    },
   };
   const next = raw || {};
-  const roleCount = next.roleCount || {};
   const parsed = {
     dayDurationSec: Math.max(30, Math.min(900, Number(next.dayDurationSec) || defaultSettings.dayDurationSec)),
     nightDurationSec: Math.max(15, Math.min(300, Number(next.nightDurationSec) || defaultSettings.nightDurationSec)),
     maxPlayers: Math.max(CONFIG.minPlayers, Math.min(CONFIG.maxPlayers, Number(next.maxPlayers) || defaultSettings.maxPlayers)),
     visibility: String(next.visibility || defaultSettings.visibility) === 'private' ? 'private' : 'public',
-    roleCount: {
-      malware: Math.max(0, Math.floor(Number(roleCount.malware) || defaultSettings.roleCount.malware)),
-      analyst: Math.max(0, Math.floor(Number(roleCount.analyst) || defaultSettings.roleCount.analyst)),
-      defender: Math.max(0, Math.floor(Number(roleCount.defender) || defaultSettings.roleCount.defender)),
-      logicbomb: Math.max(0, Math.floor(Number(roleCount.logicbomb) || defaultSettings.roleCount.logicbomb)),
-      sysadmin: Math.max(0, Math.floor(Number(roleCount.sysadmin) || defaultSettings.roleCount.sysadmin)),
-      user: Math.max(0, Math.floor(Number(roleCount.user) || defaultSettings.roleCount.user)),
-    },
   };
   return parsed;
-}
-
-function buildRolePool(settings, total) {
-  const pool = [];
-  const roleCount = settings.roleCount;
-  for (let i = 0; i < roleCount.malware; i += 1) pool.push('malware');
-  for (let i = 0; i < roleCount.analyst; i += 1) pool.push('analyst');
-  for (let i = 0; i < roleCount.defender; i += 1) pool.push('defender');
-  for (let i = 0; i < roleCount.logicbomb; i += 1) pool.push('logicbomb');
-  for (let i = 0; i < roleCount.sysadmin; i += 1) pool.push('sysadmin');
-  for (let i = 0; i < roleCount.user; i += 1) pool.push('user');
-
-  while (pool.length < total) pool.push('user');
-  return pool;
-}
-
-function validateRoleConfig(settings, playerCount) {
-  const roleCount = settings.roleCount;
-  const malwareCount = roleCount.malware;
-  const nonMalwareCount =
-    roleCount.analyst + roleCount.defender + roleCount.logicbomb + roleCount.sysadmin + roleCount.user;
-
-  if (malwareCount <= 0) {
-    return 'Komposisi role tidak valid: minimal harus ada 1 Malware.';
-  }
-  if (nonMalwareCount <= 0) {
-    return 'Komposisi role tidak valid: minimal harus ada 1 role non-Malware.';
-  }
-  if (malwareCount >= playerCount) {
-    return 'Komposisi role tidak valid untuk jumlah pemain sekarang: Malware tidak boleh sama/lebih banyak dari total pemain.';
-  }
-  return null;
 }
 
 function summarizePlayer(player) {
@@ -550,16 +493,24 @@ function assignRoles(room) {
   const allPlayers = [...room.players.values()];
   const total = allPlayers.length;
 
-  // Auto-balance Malware count if set to 0 (default fallback)
-  room.settings.roleCount.malware = (total >= 8) ? 2 : 1;
+  // 1 Malware for 6-7 players, 2 Malware for 8-12 players
+  const malwareCount = (total >= 8) ? 2 : 1;
+  const pool = [];
+  for (let i = 0; i < malwareCount; i++) pool.push('malware');
 
-  const dynamicPool = buildRolePool(room.settings, total);
+  // Distribute other roles evenly
+  const others = ['analyst', 'defender', 'logicbomb', 'sysadmin', 'user'];
+  let idx = 0;
+  while (pool.length < total) {
+    pool.push(others[idx % others.length]);
+    idx++;
+  }
 
-  const shuffled = shuffle(dynamicPool).slice(0, total);
+  const shuffledPool = shuffle(pool);
   const playersShuffled = shuffle(allPlayers);
 
   playersShuffled.forEach((player, idx) => {
-    player.role = shuffled[idx];
+    player.role = shuffledPool[idx];
     player.alive = true;
     player.protected = false;
     player.eliminatedRound = null;
@@ -860,11 +811,6 @@ io.on('connection', (socket) => {
 
     if (room.players.size < CONFIG.minPlayers) {
       socket.emit('error:message', `Minimal ${CONFIG.minPlayers} pemain untuk memulai.`);
-      return;
-    }
-    const roleConfigError = validateRoleConfig(room.settings, room.players.size);
-    if (roleConfigError) {
-      socket.emit('error:message', roleConfigError);
       return;
     }
 

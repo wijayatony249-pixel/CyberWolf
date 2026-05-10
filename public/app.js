@@ -59,11 +59,6 @@ const statusList = document.getElementById('statusList');
 const setupCard = document.getElementById('setupCard');
 const setupVisibility = document.getElementById('setupVisibility');
 const dayMinutesInput = document.getElementById('dayMinutesInput');
-const roleMalwareInput = document.getElementById('roleMalwareInput');
-const roleAnalystInput = document.getElementById('roleAnalystInput');
-const roleDefenderInput = document.getElementById('roleDefenderInput');
-const roleLogicbombInput = document.getElementById('roleLogicbombInput');
-const roleSysadminInput = document.getElementById('roleSysadminInput');
 const roleUserInput = document.getElementById('roleUserInput');
 const maxPlayersInput = document.getElementById('maxPlayersInput');
 const saveSetupBtn = document.getElementById('saveSetupBtn');
@@ -208,15 +203,7 @@ function showGameOver(winner) {
 gameOverBtn.onclick = () => backToLanding();
 
 
-function populateRoleSelect(selectEl) {
-  selectEl.innerHTML = '';
-  for (let i = 0; i <= 12; i += 1) {
-    const opt = document.createElement('option');
-    opt.value = String(i);
-    opt.textContent = `🎯 ${i} pemain`;
-    selectEl.appendChild(opt);
-  }
-}
+// populateRoleSelect removed - no longer needed
 
 
 function initSetupSelects() {
@@ -623,12 +610,7 @@ function renderState(nextState) {
     if (dayMinutesInput) dayMinutesInput.value = String(Math.round((state.settings.dayDurationSec || 300) / 60) || 5);
     if (nightSecondsInput) nightSecondsInput.value = String(state.settings.nightDurationSec || 15);
     if (maxPlayersInput) maxPlayersInput.value = String(state.settings.maxPlayers || 12);
-    roleMalwareInput.value = String(state.settings.roleCount?.malware ?? 2);
-    roleAnalystInput.value = String(state.settings.roleCount?.analyst ?? 1);
-    roleDefenderInput.value = String(state.settings.roleCount?.defender ?? 1);
-    roleLogicbombInput.value = String(state.settings.roleCount?.logicbomb ?? 1);
-    roleSysadminInput.value = String(state.settings.roleCount?.sysadmin ?? 1);
-    roleUserInput.value = String(state.settings.roleCount?.user ?? 0);
+    if (maxPlayersInput) maxPlayersInput.value = String(state.settings.maxPlayers || 12);
   }
 
   if (timerInterval) clearInterval(timerInterval);
@@ -653,15 +635,7 @@ createBtn.onclick = () => {
       visibility: setupVisibility.value,
       dayDurationSec: Math.round(dayMinutes * 60),
       nightDurationSec: nightSeconds,
-      maxPlayers: maxPlayers,
-      roleCount: {
-        malware: Number(roleMalwareInput.value || 0),
-        analyst: Number(roleAnalystInput.value || 0),
-        defender: Number(roleDefenderInput.value || 0),
-        logicbomb: Number(roleLogicbombInput.value || 0),
-        sysadmin: Number(roleSysadminInput.value || 0),
-        user: Number(roleUserInput.value || 0),
-      }
+      maxPlayers: maxPlayers
     }
   });
 };
