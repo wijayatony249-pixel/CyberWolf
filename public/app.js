@@ -535,8 +535,7 @@ function renderState(nextState) {
   addBotBtn.style.display = isCreator && isLobby ? 'inline-block' : 'none';
   dissolveBtn.style.display = isCreator && isLobby ? 'inline-block' : 'none';
   leaveBtn.style.display = isLobby ? 'inline-block' : 'none';
-  setupCard.style.display = isCreator && isLobby ? 'block' : 'none';
-  saveSetupBtn.disabled = !(isCreator && isLobby);
+  // setupCard and saveSetupBtn are no longer inside the game view
 
   voteBtn.disabled = !(isDay && alive);
   roleActionBtn.disabled = !(isNight && alive);
@@ -595,8 +594,21 @@ function renderState(nextState) {
 
 createBtn.onclick = () => {
   attemptPlayMusic();
+  const dayMinutes = Number(dayMinutesInput.value || 5);
   socket.emit('room:create', {
     username: usernameInput.value,
+    settings: {
+      visibility: setupVisibility.value,
+      dayDurationSec: Math.round(dayMinutes * 60),
+      roleCount: {
+        malware: Number(roleMalwareInput.value || 0),
+        analyst: Number(roleAnalystInput.value || 0),
+        defender: Number(roleDefenderInput.value || 0),
+        logicbomb: Number(roleLogicbombInput.value || 0),
+        sysadmin: Number(roleSysadminInput.value || 0),
+        user: Number(roleUserInput.value || 0),
+      }
+    }
   });
 };
 
@@ -659,21 +671,7 @@ sysKillBtn.onclick = () => {
   socket.emit('action:night', { action: 'sysadmin:kill', targetId });
 };
 
-saveSetupBtn.onclick = () => {
-  const dayMinutes = Number(dayMinutesInput.value || 5);
-  socket.emit('game:updateSettings', {
-    visibility: setupVisibility.value,
-    dayDurationSec: Math.round(dayMinutes * 60),
-    roleCount: {
-      malware: Number(roleMalwareInput.value || 0),
-      analyst: Number(roleAnalystInput.value || 0),
-      defender: Number(roleDefenderInput.value || 0),
-      logicbomb: Number(roleLogicbombInput.value || 0),
-      sysadmin: Number(roleSysadminInput.value || 0),
-      user: Number(roleUserInput.value || 0),
-    },
-  });
-};
+// saveSetupBtn removed, settings are defined on room creation
 
 sendChatBtn.onclick = () => {
   socket.emit('chat:send', { text: chatInput.value });

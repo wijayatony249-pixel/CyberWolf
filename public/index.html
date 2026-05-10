@@ -28,6 +28,50 @@
           <button id="createBtn">Buat Room Otomatis</button>
           <button id="joinBtn" class="btn-muted">Join dengan Token</button>
         </div>
+        
+        <details class="quick-guide setup-details">
+          <summary style="cursor:pointer; font-weight:bold; margin-bottom: 8px;">⚙️ Setting Game (Khusus Buat Room)</summary>
+          <div id="setupCard" class="setup-card">
+            <p class="small-text">Atur durasi voting siang dan komposisi role sebelum game dimulai.</p>
+            <label for="setupVisibility">Akses Lobby</label>
+            <select id="setupVisibility">
+              <option value="public">🌐 Public Lobby</option>
+              <option value="private">🔒 Private Lobby</option>
+            </select>
+            <p class="field-note">Public tampil di landing page, private hanya bisa join via token.</p>
+
+            <label for="dayMinutesInput">Durasi Voting Siang</label>
+            <select id="dayMinutesInput">
+              <option value="1">⏱️ 1 menit</option>
+              <option value="2">⏱️ 2 menit</option>
+              <option value="3">⏱️ 3 menit</option>
+              <option value="4">⏱️ 4 menit</option>
+              <option value="5">⏱️ 5 menit</option>
+              <option value="6">⏱️ 6 menit</option>
+              <option value="7">⏱️ 7 menit</option>
+              <option value="8">⏱️ 8 menit</option>
+              <option value="9">⏱️ 9 menit</option>
+              <option value="10">⏱️ 10 menit</option>
+              <option value="12">⏱️ 12 menit</option>
+              <option value="15">⏱️ 15 menit</option>
+            </select>
+            <p class="field-note">Default saat room dibuat: 5 menit.</p>
+
+            <label for="roleMalwareInput">Jumlah Role 🦠 Malware</label>
+            <select id="roleMalwareInput"></select>
+            <label for="roleAnalystInput">Jumlah Role 🕵️ Analyst</label>
+            <select id="roleAnalystInput"></select>
+            <label for="roleDefenderInput">Jumlah Role 🛡️ Defender</label>
+            <select id="roleDefenderInput"></select>
+            <label for="roleLogicbombInput">Jumlah Role 💣 Logic Bomb</label>
+            <select id="roleLogicbombInput"></select>
+            <label for="roleSysadminInput">Jumlah Role 🧑‍💻 System Admin</label>
+            <select id="roleSysadminInput"></select>
+            <label for="roleUserInput">Jumlah Role 🙂 Regular User</label>
+            <select id="roleUserInput"></select>
+            <p class="field-note">Jumlah Malware otomatis disesuaikan jika setting ini dibiarkan 0.</p>
+          </div>
+        </details>
         <div class="quick-guide lobby-section">
           <h3>&#x1F7E2; Lobby Aktif</h3>
           <p class="field-note">Room yang sedang menunggu pemain. Klik Join untuk bergabung.</p>
@@ -76,50 +120,6 @@
         </div>
 
         <div class="game-grid">
-          <!-- LOBBY ONLY -->
-          <article id="setupCard" class="panel-block lobby-only">
-            <h3>Game Setup (Creator)</h3>
-            <p class="small-text">Atur durasi voting siang dan komposisi role sebelum game dimulai.</p>
-            <label for="setupVisibility">Akses Lobby</label>
-            <select id="setupVisibility">
-              <option value="public">&#x1F310; Public Lobby</option>
-              <option value="private">&#x1F512; Private Lobby</option>
-            </select>
-            <p class="field-note">Public tampil di landing page, private hanya bisa join via token.</p>
-
-            <label for="dayMinutesInput">Durasi Voting Siang</label>
-            <select id="dayMinutesInput">
-              <option value="1">&#x23F1;&#xFE0F; 1 menit</option>
-              <option value="2">&#x23F1;&#xFE0F; 2 menit</option>
-              <option value="3">&#x23F1;&#xFE0F; 3 menit</option>
-              <option value="4">&#x23F1;&#xFE0F; 4 menit</option>
-              <option value="5">&#x23F1;&#xFE0F; 5 menit</option>
-              <option value="6">&#x23F1;&#xFE0F; 6 menit</option>
-              <option value="7">&#x23F1;&#xFE0F; 7 menit</option>
-              <option value="8">&#x23F1;&#xFE0F; 8 menit</option>
-              <option value="9">&#x23F1;&#xFE0F; 9 menit</option>
-              <option value="10">&#x23F1;&#xFE0F; 10 menit</option>
-              <option value="12">&#x23F1;&#xFE0F; 12 menit</option>
-              <option value="15">&#x23F1;&#xFE0F; 15 menit</option>
-            </select>
-            <p class="field-note">Default saat room dibuat: 5 menit.</p>
-
-            <label for="roleMalwareInput">Jumlah Role &#x1F9A0; Malware</label>
-            <select id="roleMalwareInput"></select>
-            <label for="roleAnalystInput">Jumlah Role &#x1F575;&#xFE0F; Analyst</label>
-            <select id="roleAnalystInput"></select>
-            <label for="roleDefenderInput">Jumlah Role &#x1F6E1;&#xFE0F; Defender</label>
-            <select id="roleDefenderInput"></select>
-            <label for="roleLogicbombInput">Jumlah Role &#x1F4A3; Logic Bomb</label>
-            <select id="roleLogicbombInput"></select>
-            <label for="roleSysadminInput">Jumlah Role &#x1F9D1;&#x200D;&#x1F4BB; System Admin</label>
-            <select id="roleSysadminInput"></select>
-            <label for="roleUserInput">Jumlah Role &#x1F642; Regular User</label>
-            <select id="roleUserInput"></select>
-            <p class="field-note">Jumlah Malware otomatis disesuaikan: 1 jika &lt;8 pemain, 2 jika 8 pemain.</p>
-            <button id="saveSetupBtn" class="btn-muted">Simpan Setting</button>
-          </article>
-
           <!-- Daftar Agent (always visible) -->
           <article class="panel-block">
             <h3>Daftar Agent</h3>

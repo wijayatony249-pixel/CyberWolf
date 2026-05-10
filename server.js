@@ -701,7 +701,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 io.on('connection', (socket) => {
   socket.emit('lobby:list', getPublicLobbies());
 
-  socket.on('room:create', ({ username, visibility }) => {
+  socket.on('room:create', ({ username, visibility, settings }) => {
     const cleanName = String(username || '').trim().slice(0, 20);
     if (!cleanName) {
       socket.emit('error:message', 'Nama agent wajib diisi.');
@@ -710,7 +710,12 @@ io.on('connection', (socket) => {
 
     const roomCode = generateRoomCode();
     const room = createRoom(roomCode);
-    room.settings.visibility = String(visibility || 'public') === 'private' ? 'private' : 'public';
+    
+    if (settings) {
+      room.settings = normalizeRoomSettings(settings);
+    } else {
+      room.settings.visibility = String(visibility || 'public') === 'private' ? 'private' : 'public';
+    }
     rooms.set(roomCode, room);
 
     room.players.set(socket.id, {
