@@ -59,6 +59,7 @@ const statusList = document.getElementById('statusList');
 const setupCard = document.getElementById('setupCard');
 const setupVisibility = document.getElementById('setupVisibility');
 const dayMinutesInput = document.getElementById('dayMinutesInput');
+const nightSecondsInput = document.getElementById('nightSecondsInput');
 const roleUserInput = document.getElementById('roleUserInput');
 const maxPlayersInput = document.getElementById('maxPlayersInput');
 const saveSetupBtn = document.getElementById('saveSetupBtn');
