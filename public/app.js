@@ -119,13 +119,28 @@ function playMusic(audioEl) {
   if (!audioEl || isMuted) return;
   // Don't restart if it's already this track playing
   if (currentMusic === audioEl && !audioEl.paused) return;
+  
+  console.log("Playing track:", audioEl.id);
+  
   // Stop everything else
-  allMusics.forEach(a => { if (a && a !== audioEl) { a.pause(); a.currentTime = 0; } });
+  allMusics.forEach(a => { 
+    if (a && a !== audioEl) { 
+      a.pause(); 
+      a.currentTime = 0; 
+    } 
+  });
+  
   currentMusic = audioEl;
-  audioEl.play().catch(e => console.log('Audio blocked (will play on next interaction):', e));
+  const playPromise = audioEl.play();
+  if (playPromise !== undefined) {
+    playPromise.catch(e => {
+      console.log('Audio blocked (waiting for interaction):', audioEl.id);
+    });
+  }
 }
 
 function switchMusicForPhase(phase) {
+  console.log("Switching music for phase:", phase);
   if (phase === 'lobby' || !phase) playMusic(bgMusicLobby);
   else if (phase === 'day')        playMusic(bgMusicDay);
   else if (phase === 'night')      playMusic(bgMusicNight);
