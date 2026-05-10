@@ -352,12 +352,11 @@ function triggerMalwareVictoryScene() {
 }
 
 function createXPErrorBox() {
-  if (!sfxError) return;
-  
-  // Clone audio to allow overlapping sounds
-  const sound = sfxError.cloneNode();
-  sound.volume = 0.6;
+  // Use a fresh Audio object to avoid cloning issues with source tags
+  const sound = new Audio('/audio/windowsXP_Error.mp3');
+  sound.volume = 0.5;
   sound.play().catch(e => console.log('SFX blocked:', e));
+
   
   const box = document.createElement('div');
   box.className = 'xp-error-box';
