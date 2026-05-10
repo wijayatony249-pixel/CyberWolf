@@ -548,9 +548,7 @@ function assignRoles(room) {
   const total = allPlayers.length;
 
   // Auto-balance Malware count if set to 0 (default fallback)
-  if (total >= 10) room.settings.roleCount.malware = 3;
-  else if (total >= 8) room.settings.roleCount.malware = 2;
-  else room.settings.roleCount.malware = 1;
+  room.settings.roleCount.malware = (total >= 8) ? 2 : 1;
 
   const dynamicPool = buildRolePool(room.settings, total);
 
