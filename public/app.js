@@ -22,6 +22,10 @@ const confirmMessage = document.getElementById('confirmMessage');
 const confirmCancelBtn = document.getElementById('confirmCancelBtn');
 const confirmOkBtn = document.getElementById('confirmOkBtn');
 
+const alertModal = document.getElementById('alertModal');
+const alertMessage = document.getElementById('alertMessage');
+const alertOkBtn = document.getElementById('alertOkBtn');
+
 const roomLabel = document.getElementById('roomLabel');
 const meLabel = document.getElementById('meLabel');
 const roleDesc = document.getElementById('roleDesc');
@@ -162,6 +166,16 @@ confirmModal.onclick = (e) => {
     confirmModal.classList.add('hidden');
     onConfirmCallback = null;
   }
+};
+
+function showAlert(message) {
+  alertMessage.innerText = message;
+  alertModal.classList.remove('hidden');
+}
+
+alertOkBtn.onclick = () => alertModal.classList.add('hidden');
+alertModal.onclick = (e) => {
+  if (e.target === alertModal) alertModal.classList.add('hidden');
 };
 
 function backToLanding() {
@@ -744,22 +758,22 @@ socket.on('room:state', (newState) => {
 
 socket.on('room:created', ({ roomCode }) => {
   roomCodeInput.value = roomCode;
-  alert(`Room berhasil dibuat. Token room kamu: ${roomCode}`);
+  showAlert(`Room berhasil dibuat. Token room kamu: ${roomCode}`);
 });
 
 socket.on('room:left', ({ message }) => {
   backToLanding();
-  if (message) alert(message);
+  if (message) showAlert(message);
 });
 
 socket.on('room:kicked', ({ message }) => {
   backToLanding();
-  if (message) alert(message);
+  if (message) showAlert(message);
 });
 
 socket.on('room:dissolved', ({ message }) => {
   backToLanding();
-  alert(message || 'Lobby dibubarkan oleh host.');
+  showAlert(message || 'Lobby dibubarkan oleh host.');
 });
 
 socket.on('lobby:list', (data) => {
@@ -773,13 +787,13 @@ socket.on('chat:new', (msg) => {
 });
 
 socket.on('action:logicbomb:available', () => {
-  alert('💣 Logic Bomb aktif! Pilih target di dropdown lalu klik OK.');
+  showAlert('💣 Logic Bomb aktif! Pilih target di dropdown lalu klik OK.');
   const targetId = selectedTargetId();
   if (targetId) socket.emit('action:logicbomb:shot', { targetId });
 });
 
 socket.on('error:message', (err) => {
-  alert(err);
+  showAlert(err);
 });
 
 // --- Fetch game history from Supabase via /api/history ---
