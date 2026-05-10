@@ -1161,6 +1161,6 @@ app.get('/api/history', async (req, res) => {
   }
 });
 
-server.listen(PORT, () => {
-  console.log(`Cyberwolf server running at http://localhost:${PORT}`);
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Cyberwolf server running at http://0.0.0.0:${PORT}`);
 });
