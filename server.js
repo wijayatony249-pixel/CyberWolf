@@ -168,6 +168,7 @@ function roomViewForPlayer(room, socketId) {
     winner: room.winner || null,
     minPlayers: CONFIG.minPlayers,
     phaseEndsAt: room.phaseEndsAt,
+    serverNow: Date.now(),
     settings: room.settings,
     me: me
       ? {

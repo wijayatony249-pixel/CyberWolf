@@ -615,11 +615,11 @@ function renderState(nextState) {
 
   if (timerInterval) clearInterval(timerInterval);
   timerInterval = setInterval(() => {
-    if (!state || !state.phaseEndsAt) {
+    if (!state || !state.localEndsAt) {
       timerLabel.textContent = 'Timer: -';
       return;
     }
-    const sec = Math.max(0, Math.floor((state.phaseEndsAt - Date.now()) / 1000));
+    const sec = Math.max(0, Math.floor((state.localEndsAt - Date.now()) / 1000));
     timerLabel.textContent = `Timer: ${sec}s`;
   }, 500);
 }
@@ -730,6 +730,10 @@ socket.on('room:state', (newState) => {
 
   joinCard.classList.add('hidden');
   gameCard.classList.remove('hidden');
+
+  const remainingMs = newState.phaseEndsAt ? (newState.phaseEndsAt - newState.serverNow) : null;
+  newState.localEndsAt = remainingMs !== null ? (Date.now() + remainingMs) : null;
+
   state = newState;
   renderState(newState);
 });
