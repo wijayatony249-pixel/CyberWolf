@@ -1170,3 +1170,323 @@ button:disabled {
     padding: 7px 8px;
   }
 }
+
+/* ===== MALWARE ERROR SCENE (XP STYLE) ===== */
+.malware-error-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.error-box-container {
+  position: absolute;
+  inset: 0;
+}
+
+.xp-error-box {
+  position: absolute;
+  width: 320px;
+  background: #ece9d8;
+  border: 2px solid #0054e3;
+  border-radius: 4px 4px 0 0;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
+  pointer-events: auto;
+  user-select: none;
+}
+
+.xp-error-title {
+  background: linear-gradient(to right, #0054e3, #27c1ff);
+  color: white;
+  padding: 3px 8px;
+  font-family: 'Tahoma', sans-serif;
+  font-weight: bold;
+  font-size: 11px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.xp-error-close {
+  background: #e31600;
+  color: white;
+  width: 14px;
+  height: 14px;
+  display: grid;
+  place-items: center;
+  font-size: 9px;
+  border-radius: 2px;
+  border: 1px solid #fff;
+}
+
+.xp-error-body {
+  padding: 15px;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  color: #000 !important;
+  font-family: 'Tahoma', sans-serif;
+  font-size: 11px;
+}
+
+.xp-error-icon {
+  width: 32px;
+  height: 32px;
+  background: red;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.xp-error-footer {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  background: #ece9d8;
+}
+
+.xp-button {
+  background: #ece9d8;
+  border: 1px solid #003c74;
+  padding: 4px 20px;
+  font-size: 11px;
+  color: #000;
+  box-shadow: inset -1px -1px 1px #808080;
+  cursor: pointer;
+  min-height: unset;
+  width: auto;
+}
+
+/* BSOD Layer */
+.bsod-layer {
+  position: fixed;
+  inset: 0;
+  background: #0000aa;
+  color: white;
+  padding: 50px;
+  font-family: 'Consolas', 'Courier New', monospace;
+  z-index: 10000;
+}
+
+.bsod-content h1 {
+  font-size: 120px;
+  margin: 0 0 40px;
+  text-shadow: none;
+  color: white;
+}
+
+.bsod-content p {
+  font-size: 20px;
+  margin-bottom: 20px;
+  color: white;
+  text-shadow: none;
+}
+
+.bsod-footer {
+  margin-top: 50px;
+}
+
+/* Animations */
+@keyframes glitch-shake {
+  0% { transform: translate(0); }
+  20% { transform: translate(-10px, 5px); }
+  40% { transform: translate(10px, -5px); }
+  60% { transform: translate(-5px, 10px); }
+  80% { transform: translate(5px, -10px); }
+  100% { transform: translate(0); }
+}
+
+.glitch-active {
+  animation: glitch-shake 0.2s infinite;
+}
+
+/* ===== SECURITY WIN SCENE (DEEP SCAN & PURGE) ===== */
+.security-win-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: radial-gradient(circle, #0a2d26 0%, #04070f 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.radar-scan {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 20%;
+  background: linear-gradient(to bottom, transparent, rgba(50, 255, 210, 0.4), transparent);
+  box-shadow: 0 0 50px rgba(50, 255, 210, 0.5);
+  animation: radarMove 3s infinite linear;
+  pointer-events: none;
+}
+
+@keyframes radarMove {
+  0% { top: -20%; }
+  100% { top: 120%; }
+}
+
+.purge-terminal {
+  width: min(600px, 90vw);
+  height: 300px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 20px;
+  font-family: 'Consolas', monospace;
+  font-size: 14px;
+  color: var(--accent);
+  overflow-y: auto;
+  box-shadow: 0 0 30px rgba(50, 255, 210, 0.2);
+  margin-bottom: 20px;
+  scrollbar-width: none;
+}
+
+.purge-terminal::-webkit-scrollbar { display: none; }
+
+.purge-line {
+  margin: 0 0 5px;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: lineFadeIn 0.2s forwards;
+}
+
+@keyframes lineFadeIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hologram-shield {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: shieldHologram 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.shield-icon {
+  font-size: 120px;
+  filter: drop-shadow(0 0 30px #32ffd2);
+  margin-bottom: 20px;
+}
+
+.hologram-shield h2 {
+  color: var(--accent);
+  font-size: 3rem;
+  margin: 0;
+  text-shadow: 0 0 20px rgba(50, 255, 210, 0.8);
+}
+
+.hologram-shield p {
+  color: var(--muted);
+  font-size: 1.2rem;
+}
+
+@keyframes shieldHologram {
+  from { transform: scale(0.5); opacity: 0; filter: blur(10px); }
+  to { transform: scale(1); opacity: 1; filter: blur(0); }
+}
+
+/* ===== MALWARE SUCCESS SCENE (For Winners) ===== */
+.malware-success-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: #04070f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.success-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  animation: breachPulse 2s infinite ease-in-out;
+}
+
+.breach-icon {
+  font-size: 100px;
+  color: #ff3b5c;
+  filter: drop-shadow(0 0 20px rgba(255, 59, 92, 0.8));
+  margin-bottom: 20px;
+}
+
+.malware-success-scene h2 {
+  font-size: 3.5rem;
+  color: #ff3b5c;
+  text-shadow: 0 0 25px rgba(255, 59, 92, 0.9);
+}
+
+@keyframes breachPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* ===== MALWARE DELETED SCENE (For Losers) ===== */
+.malware-deleted-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-family: 'Consolas', monospace;
+}
+
+.delete-content {
+  text-align: center;
+  animation: dissolveText 5s forwards;
+}
+
+.delete-log {
+  margin: 5px 0;
+  font-size: 18px;
+  opacity: 0;
+  animation: logSlide 0.5s forwards;
+}
+
+.delete-log:nth-child(2) { animation-delay: 1s; }
+.delete-log:nth-child(3) { animation-delay: 2s; }
+.delete-log:nth-child(4) { animation-delay: 3s; }
+.delete-log:nth-child(5) { animation-delay: 4.5s; }
+
+@keyframes logSlide {
+  to { opacity: 1; transform: translateY(-5px); }
+}
+
+@keyframes dissolveText {
+  0% { filter: blur(0); opacity: 1; }
+  80% { filter: blur(2px); opacity: 0.8; }
+  100% { filter: blur(15px); opacity: 0; transform: scale(1.2); }
+}
+
+.dissolve-effect {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, transparent 0%, #000 100%);
+  animation: screenDim 5s forwards;
+}
+
+@keyframes screenDim {
+  from { background-size: 100% 100%; }
+  to { background-size: 200% 200%; }
+}
+
+.glitch-text {
+  font-size: 4rem;
+  color: #ff3b5c;
+  animation: glitch-shake 0.1s infinite;
+}

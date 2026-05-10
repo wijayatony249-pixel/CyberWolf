@@ -67,6 +67,19 @@ const chatBox = document.getElementById('chatBox');
 const chatInput = document.getElementById('chatInput');
 const sendChatBtn = document.getElementById('sendChatBtn');
 
+const malwareErrorScene = document.getElementById('malwareErrorScene');
+const errorBoxContainer = document.getElementById('errorBoxContainer');
+const bsodLayer = document.getElementById('bsodLayer');
+const sfxError = document.getElementById('sfxError');
+
+const securityWinScene = document.getElementById('securityWinScene');
+const purgeTerminal = document.getElementById('purgeTerminal');
+const hologramShield = document.getElementById('hologramShield');
+const sfxSuccess = document.getElementById('sfxSuccess');
+
+const malwareSuccessScene = document.getElementById('malwareSuccessScene');
+const malwareDeletedScene = document.getElementById('malwareDeletedScene');
+
 const gameOverOverlay = document.getElementById('gameOverOverlay');
 const gameOverIcon    = document.getElementById('gameOverIcon');
 const gameOverTitle   = document.getElementById('gameOverTitle');
@@ -181,6 +194,22 @@ function backToLanding() {
   gameCard.classList.add('hidden');
   joinCard.classList.remove('hidden');
   gameOverOverlay.classList.add('hidden');
+
+  // Hide malware scene
+  if (malwareErrorScene) malwareErrorScene.classList.add('hidden');
+  if (bsodLayer) bsodLayer.classList.add('hidden');
+  if (errorBoxContainer) errorBoxContainer.innerHTML = '';
+  document.body.classList.remove('glitch-active');
+
+  // Hide security scene
+  if (securityWinScene) securityWinScene.classList.add('hidden');
+  if (purgeTerminal) purgeTerminal.innerHTML = '';
+  if (hologramShield) hologramShield.classList.add('hidden');
+
+  // Hide new malware scenes
+  if (malwareSuccessScene) malwareSuccessScene.classList.add('hidden');
+  if (malwareDeletedScene) malwareDeletedScene.classList.add('hidden');
+
   stopAllMusic();
   playMusic(bgMusicLobby);
 }
@@ -189,6 +218,27 @@ function showGameOver(winner) {
   // winner: 'malware' or 'security'
   stopAllMusic();
   const isMalwareWin = winner === 'malware';
+  const myRole = (state && state.me) ? state.me.role : null;
+  const isIMalware = (myRole === 'malware');
+
+  if (isMalwareWin) {
+    if (isIMalware) {
+      // I am Malware and I won
+      triggerMalwareSuccessScene();
+    } else {
+      // I am Good Guy and I lost (system crash)
+      triggerMalwareVictoryScene();
+    }
+  } else {
+    // Security Win
+    if (isIMalware) {
+      // I am Malware and I lost (being deleted)
+      triggerMalwareDeletedScene();
+    } else {
+      // I am Good Guy and I won (system restore)
+      triggerSecurityVictoryScene();
+    }
+  }
 
   gameOverOverlay.className = `game-over-overlay ${isMalwareWin ? 'malware-wins' : 'security-wins'}`;
   gameOverIcon.textContent = isMalwareWin ? '🦠' : '🛡️';
@@ -198,6 +248,126 @@ function showGameOver(winner) {
   gameOverDesc.textContent = isMalwareWin
     ? 'Malware berhasil mengeliminasi seluruh tim Security. Sistem telah dikompromikan sepenuhnya.'
     : 'Tim Security berhasil memberantas semua Malware. Jaringan aman kembali!';
+}
+
+function triggerSecurityVictoryScene() {
+  if (!securityWinScene) return;
+  securityWinScene.classList.remove('hidden');
+  purgeTerminal.classList.remove('hidden');
+  purgeTerminal.innerHTML = '';
+  hologramShield.classList.add('hidden');
+
+  // Play victory sound
+  if (sfxSuccess) {
+    sfxSuccess.volume = 0.6;
+    sfxSuccess.play().catch(e => console.log('Success SFX blocked:', e));
+  }
+
+  const logs = [
+    "[INIT] System integrity check starting...",
+    "[SCAN] Deep scanning core kernel...",
+    "[WARN] Foreign payload detected in /sys/temp/malware.exe",
+    "[PURGE] Deleting suspicious processes...",
+    "[SCAN] Checking user permissions...",
+    "[INFO] Restoring firewall rules...",
+    "[INFO] Flushing compromised cache...",
+    "[SCAN] Validating system digital signatures...",
+    "[OK] All 🦠 Malware nodes eliminated.",
+    "[INIT] Rebooting secure subsystem...",
+    "[DONE] SYSTEM INTEGRITY: 100%"
+  ];
+
+  let i = 0;
+  const logInterval = setInterval(() => {
+    if (i >= logs.length) {
+      clearInterval(logInterval);
+      setTimeout(() => {
+        purgeTerminal.classList.add('hidden');
+        hologramShield.classList.remove('hidden');
+      }, 1000);
+      return;
+    }
+
+    const p = document.createElement('p');
+    p.className = 'purge-line';
+    p.textContent = logs[i];
+    purgeTerminal.appendChild(p);
+    purgeTerminal.scrollTop = purgeTerminal.scrollHeight;
+    i++;
+  }, 400);
+}
+
+function triggerMalwareSuccessScene() {
+  if (!malwareSuccessScene) return;
+  malwareSuccessScene.classList.remove('hidden');
+  // Futuristic red theme music or effect
+}
+
+function triggerMalwareDeletedScene() {
+  if (!malwareDeletedScene) return;
+  malwareDeletedScene.classList.remove('hidden');
+  // Optional: Play a "dissolving" or "glitch" sound
+}
+
+function triggerMalwareVictoryScene() {
+  if (!malwareErrorScene) return;
+  malwareErrorScene.classList.remove('hidden');
+  document.body.classList.add('glitch-active');
+  
+  let boxCount = 0;
+  const maxBoxes = 15;
+  
+  const spawnInterval = setInterval(() => {
+    if (boxCount >= maxBoxes) {
+      clearInterval(spawnInterval);
+      setTimeout(() => {
+        if (bsodLayer) bsodLayer.classList.remove('hidden');
+        document.body.classList.remove('glitch-active');
+      }, 2500);
+      return;
+    }
+    
+    createXPErrorBox();
+    boxCount++;
+  }, 350);
+}
+
+function createXPErrorBox() {
+  if (!sfxError) return;
+  
+  // Clone audio to allow overlapping sounds
+  const sound = sfxError.cloneNode();
+  sound.volume = 0.6;
+  sound.play().catch(e => console.log('SFX blocked:', e));
+  
+  const box = document.createElement('div');
+  box.className = 'xp-error-box';
+  
+  // Random position within safe bounds
+  const x = Math.random() * (window.innerWidth - 340);
+  const y = Math.random() * (window.innerHeight - 220);
+  box.style.left = `${x}px`;
+  box.style.top = `${y}px`;
+  box.style.zIndex = 10000 + (errorBoxContainer ? errorBoxContainer.children.length : 0);
+  
+  box.innerHTML = `
+    <div class="xp-error-title">
+      <span>System Critical Error</span>
+      <div class="xp-error-close">X</div>
+    </div>
+    <div class="xp-error-body">
+      <div class="xp-error-icon">X</div>
+      <div>A critical malware infection has been detected. System integrity compromised. Your files are being deleted.</div>
+    </div>
+    <div class="xp-error-footer">
+      <button class="xp-button">OK</button>
+    </div>
+  `;
+  
+  box.querySelector('.xp-button').onclick = () => box.remove();
+  box.querySelector('.xp-error-close').onclick = () => box.remove();
+  
+  if (errorBoxContainer) errorBoxContainer.appendChild(box);
 }
 
 gameOverBtn.onclick = () => backToLanding();

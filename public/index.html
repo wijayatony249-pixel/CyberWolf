@@ -253,8 +253,63 @@
       </div>
     </div>
 
-    <!-- 3 Music Themes (local files) -->
-    <!-- Lobby: Lo-fi calm ambient -->
+    <!-- Malware Victory Error Scene (Fake Windows Error) -->
+    <div id="malwareErrorScene" class="malware-error-scene hidden">
+      <div id="errorBoxContainer" class="error-box-container"></div>
+      <div class="bsod-layer hidden" id="bsodLayer">
+        <div class="bsod-content">
+          <h1>:(</h1>
+          <p>Your system has been compromised by Malware.</p>
+          <p>A critical breach has occurred and your data is being encrypted.</p>
+          <p>If you call a technician, they will tell you: 0xMALWARE_WIN_CYBERWOLF</p>
+          <div class="bsod-footer">
+            <p>100% complete</p>
+            <p>Restarting system... (Just kidding, you lost)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Malware Success Scene (For Malware winners) -->
+    <div id="malwareSuccessScene" class="malware-success-scene hidden">
+      <div class="matrix-rain"></div>
+      <div class="success-content">
+        <div class="breach-icon">🦠</div>
+        <h2>BREACH SUCCESSFUL</h2>
+        <p>Root access granted. System controlled.</p>
+      </div>
+    </div>
+
+    <!-- Malware Deleted Scene (For Malware losers) -->
+    <div id="malwareDeletedScene" class="malware-deleted-scene hidden">
+      <div class="dissolve-effect"></div>
+      <div class="delete-content">
+        <h2 class="glitch-text">ACCESS DENIED</h2>
+        <p>System is purging your signature...</p>
+        <p class="delete-log">Deleting core.sys...</p>
+        <p class="delete-log">Deleting identity.bin...</p>
+        <p class="delete-log" style="color:red; font-weight:bold;">CONNECTION TERMINATED</p>
+      </div>
+    </div>
+
+    <!-- Security Victory Scene (Deep Scan & Purge) -->
+    <div id="securityWinScene" class="security-win-scene hidden">
+      <div class="radar-scan"></div>
+      <div id="purgeTerminal" class="purge-terminal"></div>
+      <div id="hologramShield" class="hologram-shield hidden">
+        <div class="shield-icon">🛡️</div>
+        <h2>SYSTEM SECURED</h2>
+        <p>All threats eliminated. Integrity: 100%</p>
+      </div>
+    </div>
+
+    <!-- 3 Music Themes + Error Sound -->
+    <audio id="sfxError" preload="auto">
+      <source src="/audio/windowsXP_Error.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sfxSuccess" preload="auto">
+      <source src="/audio/superMario_winner.mp3" type="audio/mpeg">
+    </audio>
     <audio id="bgMusicLobby" loop preload="auto">
       <source src="/audio/lobby.mp3" type="audio/mpeg">
     </audio>
