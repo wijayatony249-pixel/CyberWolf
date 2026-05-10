@@ -324,7 +324,13 @@ function triggerSecurityVictoryScene() {
 
 function triggerMalwareSuccessScene() {
   if (malwareSuccessScene) malwareSuccessScene.classList.remove('hidden');
+  
+  // Play Malware Victory Sound
+  const sound = new Audio('/audio/malware_win.mp3');
+  sound.volume = 0.6;
+  sound.play().catch(e => console.log('Malware SFX blocked:', e));
 }
+
 
 function triggerMalwareDeletedScene() {
   if (malwareDeletedScene) malwareDeletedScene.classList.remove('hidden');
