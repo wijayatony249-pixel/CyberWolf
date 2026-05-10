@@ -16,6 +16,12 @@ const helpBtn = document.getElementById('helpBtn');
 const closeHelpBtn = document.getElementById('closeHelpBtn');
 const helpModal = document.getElementById('helpModal');
 
+const confirmModal = document.getElementById('confirmModal');
+const confirmTitle = document.getElementById('confirmTitle');
+const confirmMessage = document.getElementById('confirmMessage');
+const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+const confirmOkBtn = document.getElementById('confirmOkBtn');
+
 const roomLabel = document.getElementById('roomLabel');
 const meLabel = document.getElementById('meLabel');
 const roleDesc = document.getElementById('roleDesc');
@@ -130,6 +136,33 @@ muteToggle.onclick = () => {
 function attemptPlayMusic() {
   if (!isMuted) playMusic(bgMusicLobby);
 }
+
+// --- Modern Confirm Notification ---
+let onConfirmCallback = null;
+function showConfirm(title, message, onConfirm) {
+  confirmTitle.innerText = title;
+  confirmMessage.innerText = message;
+  onConfirmCallback = onConfirm;
+  confirmModal.classList.remove('hidden');
+}
+
+confirmCancelBtn.onclick = () => {
+  confirmModal.classList.add('hidden');
+  onConfirmCallback = null;
+};
+
+confirmOkBtn.onclick = () => {
+  if (onConfirmCallback) onConfirmCallback();
+  confirmModal.classList.add('hidden');
+  onConfirmCallback = null;
+};
+
+confirmModal.onclick = (e) => {
+  if (e.target === confirmModal) {
+    confirmModal.classList.add('hidden');
+    onConfirmCallback = null;
+  }
+};
 
 function backToLanding() {
   state = null;
@@ -622,8 +655,17 @@ joinBtn.onclick = () => {
 
 startBtn.onclick = () => socket.emit('game:start');
 addBotBtn.onclick = () => socket.emit('room:addBot');
-dissolveBtn.onclick = () => socket.emit('room:dissolve');
-leaveBtn.onclick = () => socket.emit('room:leave');
+dissolveBtn.onclick = () => {
+  showConfirm('Bubar Lobby', 'Apakah Anda yakin ingin membubarkan lobby ini? Semua pemain akan dikeluarkan.', () => {
+    socket.emit('room:dissolve');
+  });
+};
+
+leaveBtn.onclick = () => {
+  showConfirm('Keluar Lobby', 'Apakah Anda yakin ingin meninggalkan room ini?', () => {
+    socket.emit('room:leave');
+  });
+};
 helpBtn.onclick = () => helpModal.classList.remove('hidden');
 closeHelpBtn.onclick = () => helpModal.classList.add('hidden');
 helpModal.onclick = (e) => {
@@ -686,9 +728,18 @@ chatInput.addEventListener('keydown', (e) => {
 });
 
 socket.on('room:state', (newState) => {
+  const oldPhase = state ? state.phase : null;
+  const oldCode = state ? state.code : null;
+
+  // Clear chat if entering a new room or returning to lobby from game
+  if (newState.code !== oldCode || (oldPhase && oldPhase !== 'lobby' && newState.phase === 'lobby')) {
+    chatBox.innerHTML = '';
+  }
+
   joinCard.classList.add('hidden');
   gameCard.classList.remove('hidden');
-  renderState(newState);
+  state = newState;
+  renderState();
 });
 
 socket.on('room:created', ({ roomCode }) => {

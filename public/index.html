@@ -188,13 +188,25 @@
     <div id="helpModal" class="modal hidden">
       <div class="modal-card">
         <h3>Panduan Role Cyberwolf</h3>
-        <p><strong>&#x1F9A0; Malware:</strong> Pilih 1 target tiap malam untuk diinfeksi.</p>
-        <p><strong>&#x1F575;&#xFE0F; Security Analyst:</strong> Scan 1 target tiap malam, tahu dia Malware atau bukan.</p>
-        <p><strong>&#x1F6E1;&#xFE0F; Firewall:</strong> Lindungi 1 target tiap malam dari serangan Malware.</p>
-        <p><strong>&#x1F9D1;&#x200D;&#x1F4BB; System Admin:</strong> Punya 1x Restore dan 1x Force Delete.</p>
-        <p><strong>&#x1F4A3; Logic Bomb:</strong> Jika mati, bisa bawa 1 pemain ikut terhapus.</p>
-        <p><strong>&#x1F642; Regular User:</strong> Fokus diskusi, cari pelaku, dan voting dengan tepat.</p>
+        <p><strong>🦠 Malware:</strong> Pilih 1 target tiap malam untuk diinfeksi.</p>
+        <p><strong>🕵️ Security Analyst:</strong> Scan 1 target tiap malam, tahu dia Malware atau bukan.</p>
+        <p><strong>🛡️ Firewall:</strong> Lindungi 1 target tiap malam dari serangan Malware.</p>
+        <p><strong>🧑‍💻 System Admin:</strong> Punya 1x Restore dan 1x Force Delete.</p>
+        <p><strong>💣 Logic Bomb:</strong> Jika mati, bisa bawa 1 pemain ikut terhapus.</p>
+        <p><strong>🙂 Regular User:</strong> Fokus diskusi, cari pelaku, dan voting dengan tepat.</p>
         <button id="closeHelpBtn">Tutup</button>
+      </div>
+    </div>
+
+    <!-- Confirm Modal (Modern Notification) -->
+    <div id="confirmModal" class="modal hidden">
+      <div class="modal-card confirm-card">
+        <h3 id="confirmTitle">Konfirmasi</h3>
+        <p id="confirmMessage">Apakah Anda yakin ingin melakukan tindakan ini?</p>
+        <div class="modal-footer">
+          <button id="confirmCancelBtn" class="btn-muted">Batal</button>
+          <button id="confirmOkBtn">Ya, Lanjutkan</button>
+        </div>
       </div>
     </div>
 

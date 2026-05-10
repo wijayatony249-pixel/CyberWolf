@@ -699,6 +699,21 @@ button:disabled {
   box-shadow: 0 0 28px rgba(59, 180, 255, 0.22);
 }
 
+.confirm-card {
+  width: min(400px, 100%);
+  text-align: center;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.modal-footer button {
+  margin: 0;
+}
+
 /* Role Avatar Dashboard */
 .hero-profile {
   display: flex;
