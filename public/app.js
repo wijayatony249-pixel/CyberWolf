@@ -572,7 +572,8 @@ function renderState(nextState) {
 
   if (state.settings) {
     setupVisibility.value = state.settings.visibility || 'public';
-    dayMinutesInput.value = String(Math.round((state.settings.dayDurationSec || 300) / 60));
+    if (dayMinutesInput) dayMinutesInput.value = String(Math.round((state.settings.dayDurationSec || 300) / 60) || 5);
+    if (nightSecondsInput) nightSecondsInput.value = String(state.settings.nightDurationSec || 15);
     roleMalwareInput.value = String(state.settings.roleCount?.malware ?? 2);
     roleAnalystInput.value = String(state.settings.roleCount?.analyst ?? 1);
     roleDefenderInput.value = String(state.settings.roleCount?.defender ?? 1);
@@ -595,11 +596,13 @@ function renderState(nextState) {
 createBtn.onclick = () => {
   attemptPlayMusic();
   const dayMinutes = Number(dayMinutesInput.value || 5);
+  const nightSeconds = Number(nightSecondsInput.value || 15);
   socket.emit('room:create', {
     username: usernameInput.value,
     settings: {
       visibility: setupVisibility.value,
       dayDurationSec: Math.round(dayMinutes * 60),
+      nightDurationSec: nightSeconds,
       roleCount: {
         malware: Number(roleMalwareInput.value || 0),
         analyst: Number(roleAnalystInput.value || 0),

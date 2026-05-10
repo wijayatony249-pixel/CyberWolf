@@ -92,6 +92,7 @@ function createRoom(roomCode) {
     logs: [],
     settings: {
       dayDurationSec: CONFIG.dayDurationSec,
+      nightDurationSec: CONFIG.nightDurationSec,
       visibility: 'public',
       roleCount: {
         malware: 2,
@@ -110,6 +111,7 @@ function createRoom(roomCode) {
 function normalizeRoomSettings(raw) {
   const defaultSettings = {
     dayDurationSec: CONFIG.dayDurationSec,
+    nightDurationSec: CONFIG.nightDurationSec,
     visibility: 'public',
     roleCount: {
       malware: 2,
@@ -124,6 +126,7 @@ function normalizeRoomSettings(raw) {
   const roleCount = next.roleCount || {};
   const parsed = {
     dayDurationSec: Math.max(30, Math.min(900, Number(next.dayDurationSec) || defaultSettings.dayDurationSec)),
+    nightDurationSec: Math.max(15, Math.min(300, Number(next.nightDurationSec) || defaultSettings.nightDurationSec)),
     visibility: String(next.visibility || defaultSettings.visibility) === 'private' ? 'private' : 'public',
     roleCount: {
       malware: Math.max(0, Math.floor(Number(roleCount.malware) || defaultSettings.roleCount.malware)),
@@ -450,12 +453,12 @@ function resolveDay(roomCode) {
 function startNight(room) {
   room.phase = 'night';
   resetNightActions(room);
-  room.phaseEndsAt = Date.now() + CONFIG.nightDurationSec * 1000;
+  room.phaseEndsAt = Date.now() + room.settings.nightDurationSec * 1000;
   sendLog(room, `Malam tiba. Role khusus dapat menggunakan skill.`);
   emitRoomState(room);
 
   clearPhaseTimer(room);
-  room.timer = setTimeout(() => resolveNight(room.code), CONFIG.nightDurationSec * 1000);
+  room.timer = setTimeout(() => resolveNight(room.code), room.settings.nightDurationSec * 1000);
 
   simulateBotNightActions(room);
 }
