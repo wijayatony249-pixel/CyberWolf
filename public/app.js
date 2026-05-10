@@ -596,11 +596,6 @@ function renderState(nextState) {
         }, 3500);
       }, transitionDelay);
     }
-  } else if (nextState.phase !== 'ended') {
-    // Failsafe: if we missed music switch due to refresh
-    switchMusicForPhase(nextState.phase);
-  }
-
     // Game Over Screen
     if (nextState.phase === 'ended') {
       if (!hasShownGameOverThisGame) {
@@ -616,6 +611,9 @@ function renderState(nextState) {
     hasShownGameOverThisGame = true;
     const winner = nextState.winner || 'security';
     showGameOver(winner);
+  } else if (nextState.phase !== 'ended') {
+    // Failsafe: if we missed music switch due to refresh
+    switchMusicForPhase(nextState.phase);
   }
 
   // Lobby vs In-Game panel separation
