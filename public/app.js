@@ -556,27 +556,44 @@ function renderState(nextState) {
   // Phase Transition Overlays + Music switch
   const prevPhase = state ? state.phase : null;
   if (prevPhase !== nextState.phase) {
-    // Switch music always when phase changes (including first load)
-    switchMusicForPhase(nextState.phase);
+    const isNight = nextState.phase === 'night';
+    const isDay = nextState.phase === 'day';
+    const isFirstNight = (isNight && nextState.round === 0);
+    const transitionDelay = isFirstNight ? 4000 : 0; // Wait for role reveal if it's first night
 
-    if (nextState.phase === 'night' || nextState.phase === 'day') {
-      const isNight = nextState.phase === 'night';
-      const delayMs = (isNight && nextState.round === 0) ? 4200 : 0;
+    // Handle Music with proper timing
+    setTimeout(() => {
+      switchMusicForPhase(nextState.phase);
+    }, transitionDelay);
 
+    // Handle Phase Overlay
+    if (isNight || isDay) {
       setTimeout(() => {
+        if (!phaseTransitionOverlay) return;
+        
+        // Remove hidden and set appropriate theme
+        phaseTransitionOverlay.classList.remove('hidden');
         phaseTransitionOverlay.className = isNight ? 'phase-transition' : 'phase-transition morning';
-        phaseTransitionText.style.animation = 'none';
-        void phaseTransitionText.offsetWidth;
-        phaseTransitionText.style.animation = null;
-        phaseTransitionText.textContent = isNight ? '🌙 Malam Telah Tiba...' : '☀️ Waktu Sudah Pagi...';
-        setTimeout(() => phaseTransitionOverlay.classList.add('hidden'), 3500);
-      }, delayMs);
+        
+        if (phaseTransitionText) {
+          phaseTransitionText.textContent = isNight ? '🌙 Malam Telah Tiba...' : '☀️ Waktu Sudah Pagi...';
+          // Trigger a re-flow for animation
+          phaseTransitionText.style.animation = 'none';
+          void phaseTransitionText.offsetWidth;
+          phaseTransitionText.style.animation = '';
+        }
+
+        // Hide after 3.5 seconds
+        setTimeout(() => {
+          if (phaseTransitionOverlay) phaseTransitionOverlay.classList.add('hidden');
+        }, 3500);
+      }, transitionDelay);
     }
 
     // Game Over Screen
     if (nextState.phase === 'ended') {
       const winner = nextState.winner || 'security';
-      setTimeout(() => showGameOver(winner), 1500);
+      setTimeout(() => showGameOver(winner), 1200);
     }
   }
 
