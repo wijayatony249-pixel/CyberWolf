@@ -245,15 +245,13 @@ function showGameOver(winner) {
 
     // Initial sequence trigger
     if (isMalwareWin) {
-      // Show the XP error boxes and BSOD effect to EVERYONE if Malware wins
-      triggerMalwareVictoryScene();
-      
-      // If I am the Malware, show the additional success overlay
       if (isIMalware) triggerMalwareSuccessScene();
+      else triggerMalwareVictoryScene();
     } else {
       if (isIMalware) triggerMalwareDeletedScene();
       else triggerSecurityVictoryScene();
     }
+
 
 
     // Delay the final "Malware Menang!" / "Security Menang!" modal
@@ -356,9 +354,9 @@ function triggerMalwareVictoryScene() {
 }
 
 function createXPErrorBox() {
-  console.log("Spawning XP Error Box...");
   // Use a fresh Audio object to avoid cloning issues with source tags
   const sound = new Audio('/audio/windowsXP_Error.mp3');
+
 
   sound.volume = 0.5;
   sound.play().catch(e => console.log('SFX blocked:', e));
