@@ -913,13 +913,17 @@ button:disabled {
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  opacity: 1;
+  opacity: 0;
   transition: opacity 1.5s ease-in-out, background 1.5s ease-in-out;
   pointer-events: none;
 }
 
+.phase-transition.active {
+  opacity: 1;
+}
+
 .phase-transition.hidden {
-  opacity: 0;
+  display: none !important;
 }
 
 .phase-transition h1 {

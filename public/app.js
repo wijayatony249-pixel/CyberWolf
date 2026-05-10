@@ -118,20 +118,22 @@ function stopAllMusic() {
 
 function playMusic(audioEl) {
   if (!audioEl || isMuted) return;
-  // Don't restart if it's already this track playing
-  if (currentMusic === audioEl && !audioEl.paused) return;
   
-  console.log("Playing track:", audioEl.id);
-  
-  // Stop everything else
+  // REALLY Stop everything else
   allMusics.forEach(a => { 
     if (a && a !== audioEl) { 
       a.pause(); 
       a.currentTime = 0; 
     } 
   });
+
+  // Don't restart if it's already this track playing
+  if (currentMusic === audioEl && !audioEl.paused) return;
+  
+  console.log("Playing track:", audioEl.id);
   
   currentMusic = audioEl;
+  audioEl.currentTime = 0;
   const playPromise = audioEl.play();
   if (playPromise !== undefined) {
     playPromise.catch(e => {
@@ -572,24 +574,31 @@ function renderState(nextState) {
       setTimeout(() => {
         if (!phaseTransitionOverlay) return;
         
-        // Remove hidden and set appropriate theme
+        // Remove hidden, add active and appropriate theme
         phaseTransitionOverlay.classList.remove('hidden');
-        phaseTransitionOverlay.className = isNight ? 'phase-transition' : 'phase-transition morning';
+        phaseTransitionOverlay.className = isNight ? 'phase-transition active' : 'phase-transition morning active';
         
         if (phaseTransitionText) {
           phaseTransitionText.textContent = isNight ? '🌙 Malam Telah Tiba...' : '☀️ Waktu Sudah Pagi...';
           // Trigger a re-flow for animation
           phaseTransitionText.style.animation = 'none';
           void phaseTransitionText.offsetWidth;
-          phaseTransitionText.style.animation = '';
+          phaseTransitionText.style.animation = 'phaseTextScale 3s forwards ease-out';
         }
 
         // Hide after 3.5 seconds
         setTimeout(() => {
-          if (phaseTransitionOverlay) phaseTransitionOverlay.classList.add('hidden');
+          if (phaseTransitionOverlay) {
+            phaseTransitionOverlay.classList.remove('active');
+            setTimeout(() => phaseTransitionOverlay.classList.add('hidden'), 1500); // Wait for fade out
+          }
         }, 3500);
       }, transitionDelay);
     }
+  } else if (nextState.phase !== 'ended') {
+    // Failsafe: if we missed music switch due to refresh
+    switchMusicForPhase(nextState.phase);
+  }
 
     // Game Over Screen
     if (nextState.phase === 'ended') {
