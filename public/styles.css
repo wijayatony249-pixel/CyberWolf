@@ -1179,6 +1179,11 @@ button:disabled {
   background: rgba(0, 0, 0, 0.4);
   pointer-events: none;
   overflow: hidden;
+  display: flex;
+}
+
+.malware-error-scene.hidden {
+  display: none;
 }
 
 .error-box-container {
@@ -1272,6 +1277,11 @@ button:disabled {
   padding: 50px;
   font-family: 'Consolas', 'Courier New', monospace;
   z-index: 10000;
+  display: block;
+}
+
+.bsod-layer.hidden {
+  display: none;
 }
 
 .bsod-content h1 {
@@ -1317,6 +1327,10 @@ button:disabled {
   justify-content: center;
   align-items: center;
   overflow: hidden;
+}
+
+.security-win-scene.hidden {
+  display: none;
 }
 
 .radar-scan {
@@ -1373,6 +1387,10 @@ button:disabled {
   animation: shieldHologram 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
+.hologram-shield.hidden {
+  display: none;
+}
+
 .shield-icon {
   font-size: 120px;
   filter: drop-shadow(0 0 30px #32ffd2);
@@ -1406,6 +1424,10 @@ button:disabled {
   justify-content: center;
   align-items: center;
   overflow: hidden;
+}
+
+.malware-success-scene.hidden {
+  display: none;
 }
 
 .success-content {
@@ -1444,6 +1466,10 @@ button:disabled {
   align-items: center;
   color: #fff;
   font-family: 'Consolas', monospace;
+}
+
+.malware-deleted-scene.hidden {
+  display: none;
 }
 
 .delete-content {
