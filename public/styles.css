@@ -977,7 +977,7 @@ button:disabled {
 }
 
 .game-over-overlay.hidden {
-  display: none;
+  display: none !important;
 }
 
 @keyframes fadeInOverlay {
