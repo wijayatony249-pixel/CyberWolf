@@ -556,7 +556,9 @@ function showRoleReveal(roleId, roleLabel, roleDescText) {
   }, 4000);
 }
 
-function renderState(nextState) {
+function renderState(nextState, prevPhase = null) {
+  console.log(`Rendering State. Phase: ${prevPhase} -> ${nextState.phase}`);
+
   // Check if we need to reveal role
   if (nextState.me && nextState.started && nextState.phase !== 'ended' && !hasRevealedRoleThisGame) {
     showRoleReveal(nextState.me.role, nextState.me.roleLabel, nextState.me.roleDesc);
@@ -567,8 +569,8 @@ function renderState(nextState) {
   }
 
   // Phase Transition Overlays + Music switch
-  const prevPhase = state ? state.phase : null;
   if (prevPhase !== nextState.phase) {
+
     const isNight = nextState.phase === 'night';
     const isDay = nextState.phase === 'day';
     const isFirstNight = (isNight && nextState.round === 0);
@@ -793,9 +795,11 @@ function renderState(nextState) {
   sysSaveBtn.disabled = !(isNight && alive);
   sysKillBtn.disabled = !(isNight && alive);
 
+  voteBtn.style.display = isDay ? 'inline-block' : 'none';
   roleActionBtn.style.display = ['malware', 'analyst', 'defender'].includes(role) ? 'inline-block' : 'none';
   sysSaveBtn.style.display = role === 'sysadmin' && !state.me.abilities.sysadminSaveUsed ? 'inline-block' : 'none';
   sysKillBtn.style.display = role === 'sysadmin' && !state.me.abilities.sysadminKillUsed ? 'inline-block' : 'none';
+
 
   if (role === 'malware') roleActionBtn.textContent = '🦠 Infect Target';
   if (role === 'analyst') roleActionBtn.textContent = '🕵️ Scan Target';
@@ -950,8 +954,9 @@ socket.on('room:state', (newState) => {
   const remainingMs = newState.phaseEndsAt ? (newState.phaseEndsAt - newState.serverNow) : null;
   newState.localEndsAt = remainingMs !== null ? (Date.now() + remainingMs) : null;
 
+  // Pass oldPhase to renderState BEFORE updating the global state variable
+  renderState(newState, oldPhase);
   state = newState;
-  renderState(newState);
 });
 
 socket.on('room:created', ({ roomCode }) => {
