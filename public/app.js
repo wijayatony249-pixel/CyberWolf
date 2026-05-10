@@ -690,9 +690,9 @@ if (copyRoomBtn) {
   copyRoomBtn.onclick = () => {
     if (!state || !state.code) return;
     navigator.clipboard.writeText(state.code).then(() => {
-      alert(`Kode room ${state.code} berhasil disalin ke clipboard.`);
+      showAlert(`Kode room ${state.code} berhasil disalin ke clipboard.`);
     }).catch(() => {
-      alert('Gagal menyalin kode room. Coba ulangi.');
+      showAlert('Gagal menyalin kode room. Coba ulangi.');
     });
   };
 }
@@ -753,7 +753,7 @@ socket.on('room:state', (newState) => {
   joinCard.classList.add('hidden');
   gameCard.classList.remove('hidden');
   state = newState;
-  renderState();
+  renderState(newState);
 });
 
 socket.on('room:created', ({ roomCode }) => {
