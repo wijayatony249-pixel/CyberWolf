@@ -820,15 +820,16 @@ function renderState(nextState, prevPhase = null) {
   leaveBtn.style.display = isLobby ? 'inline-block' : 'none';
   // setupCard and saveSetupBtn are no longer inside the game view
 
-  voteBtn.disabled = !(isDay && alive);
+  voteBtn.disabled = !(isVoting && alive);
   roleActionBtn.disabled = !(isNight && alive);
   sysSaveBtn.disabled = !(isNight && alive);
   sysKillBtn.disabled = !(isNight && alive);
 
-  voteBtn.style.display = isDay ? 'inline-block' : 'none';
-  roleActionBtn.style.display = ['malware', 'analyst', 'defender'].includes(role) ? 'inline-block' : 'none';
-  sysSaveBtn.style.display = role === 'sysadmin' && !state.me.abilities.sysadminSaveUsed ? 'inline-block' : 'none';
-  sysKillBtn.style.display = role === 'sysadmin' && !state.me.abilities.sysadminKillUsed ? 'inline-block' : 'none';
+  // Voting button is shown only during voting phase, others are phase-dependent
+  // voteBtn.style.display handled above now
+  roleActionBtn.style.display = (isNight && alive && ['malware', 'analyst', 'defender', 'logicbomb'].includes(role)) ? 'inline-block' : 'none';
+  sysSaveBtn.style.display = (isNight && alive && role === 'sysadmin' && !state.me.abilities.sysadminSaveUsed) ? 'inline-block' : 'none';
+  sysKillBtn.style.display = (isNight && alive && role === 'sysadmin' && !state.me.abilities.syskillUsed) ? 'inline-block' : 'none';
 
 
   if (role === 'malware') roleActionBtn.textContent = '🦠 Infect Target';
@@ -842,7 +843,7 @@ function renderState(nextState, prevPhase = null) {
     `Agent aktif: ${state.status.aliveCount}`,
     `Agent tereliminasi: ${state.status.eliminatedCount}`,
   ];
-  if (state.phase === 'day') {
+  if (isDiscussion || isVoting) {
     statusRows.push(`Progres voting: ${state.status.dayVotesSubmitted}/${state.status.dayVotesTotal}`);
   } else if (state.phase === 'night') {
     statusRows.push(`Progres aksi malam: ${state.status.nightProgressSubmitted}/${state.status.nightProgressTotal}`);
