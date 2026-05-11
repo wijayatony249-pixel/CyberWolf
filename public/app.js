@@ -889,10 +889,19 @@ function renderState(nextState, prevPhase = null) {
 }
 
 createBtn.onclick = () => {
+  console.log("Create button clicked");
+  const username = (usernameInput.value || '').trim();
+  if (!username) {
+    showAlert('Nama agent wajib diisi sebelum membuat room.');
+    return;
+  }
+
   attemptPlayMusic();
   const maxPlayers = Number(maxPlayersInput.value || 12);
+  
+  console.log("Emitting room:create", { username, maxPlayers });
   socket.emit('room:create', {
-    username: usernameInput.value,
+    username: username,
     settings: {
       visibility: setupVisibility.value,
       maxPlayers: maxPlayers
