@@ -584,7 +584,7 @@ function renderState(nextState, prevPhase = null) {
   }
 
   // Phase Transition Overlays + Music switch
-  if (oldPhase !== nextState.phase) {
+  if (prevPhase !== nextState.phase) {
 
     const isNight = nextState.phase === 'night';
     const isDay = nextState.phase === 'day';
@@ -701,11 +701,32 @@ function renderState(nextState, prevPhase = null) {
   const alive = state.me.alive;
   const role = state.me.role;
 
-  playersEl.innerHTML = '';
-  // Build custom target card list
+  if (playersEl) playersEl.innerHTML = '';
+  
+  // 1. Populate Players List First (High Priority)
+  if (playersEl && nextState.players) {
+    for (const p of nextState.players) {
+      const li = document.createElement('li');
+      li.textContent = `${p.username} ${p.alive ? 'online' : 'tereliminasi'}`;
+      
+      if (isLobby && isCreator && p.id !== nextState.me.id) {
+        const kickBtn = document.createElement('button');
+        kickBtn.className = 'btn-kick';
+        kickBtn.textContent = '❌ Kick';
+        kickBtn.onclick = () => socket.emit('room:kick', { targetId: p.id });
+        li.appendChild(kickBtn);
+      }
+
+      if (!p.alive) li.classList.add('dead');
+      if (p.id === nextState.me.id) li.classList.add('me');
+      playersEl.appendChild(li);
+    }
+  }
+
+  // 2. Build custom target card list
   if (targetList) {
     targetList.innerHTML = '';
-    selectedPlayerId = null; // reset selection on each re-render
+    selectedPlayerId = null;
 
     const PLAYER_AVATARS = {
       malware: '🦠', analyst: '🕵️', defender: '🛡️',
@@ -802,23 +823,6 @@ function renderState(nextState, prevPhase = null) {
       roleActionBtn.style.display = 'none';
     }
   }
-
-  for (const p of state.players) {
-    const li = document.createElement('li');
-    li.textContent = `${p.username} ${p.alive ? 'online' : 'tereliminasi'}`;
-    
-    // Add kick button if lobby and creator
-    if (isLobby && isCreator && p.id !== state.me.id) {
-      const kickBtn = document.createElement('button');
-      kickBtn.className = 'btn-kick';
-      kickBtn.textContent = '❌ Kick';
-      kickBtn.onclick = () => socket.emit('room:kick', { targetId: p.id });
-      li.appendChild(kickBtn);
-    }
-
-    if (!p.alive) li.classList.add('dead');
-    if (p.id === state.me.id) li.classList.add('me');
-    playersEl.appendChild(li);
 
     // (target list built above via custom cards)
   }

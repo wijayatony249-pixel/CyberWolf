@@ -770,10 +770,12 @@ io.on('connection', (socket) => {
     }
     rooms.set(roomCode, room);
 
+    const isFirst = room.players.size === 0;
     room.players.set(socket.id, {
       id: socket.id,
+      socketId: socket.id,
       username: cleanName,
-      isCreator: true,
+      isCreator: isFirst,
       role: 'user',
       alive: true,
       protected: false,
