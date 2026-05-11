@@ -58,6 +58,8 @@ const sysKillBtn = document.getElementById('sysKillBtn');
 const statusList = document.getElementById('statusList');
 const setupCard = document.getElementById('setupCard');
 const setupVisibility = document.getElementById('setupVisibility');
+const roleAvatarIcon = document.getElementById('idleAvatar'); // Reusing existing element or mapping correctly
+const roleAvatarContainer = document.getElementById('roleArticle');
 const dayMinutesInput = null;
 const nightSecondsInput = null;
 const roleUserInput = document.getElementById('roleUserInput');
@@ -825,11 +827,15 @@ function renderState(nextState, prevPhase = null) {
   sysSaveBtn.disabled = !(isNight && alive);
   sysKillBtn.disabled = !(isNight && alive);
 
-  // Voting button is shown only during voting phase, others are phase-dependent
-  // voteBtn.style.display handled above now
-  roleActionBtn.style.display = (isNight && alive && ['malware', 'analyst', 'defender', 'logicbomb'].includes(role)) ? 'inline-block' : 'none';
-  sysSaveBtn.style.display = (isNight && alive && role === 'sysadmin' && !state.me.abilities.sysadminSaveUsed) ? 'inline-block' : 'none';
-  sysKillBtn.style.display = (isNight && alive && role === 'sysadmin' && !state.me.abilities.sysadminKillUsed) ? 'inline-block' : 'none';
+  // Visibility logic for buttons
+  voteBtn.style.display = isVoting ? 'inline-block' : 'none';
+  
+  const canActAtNight = isNight && alive && ['malware', 'analyst', 'defender', 'logicbomb'].includes(role);
+  roleActionBtn.style.display = canActAtNight ? 'inline-block' : 'none';
+  
+  const isSysAdmin = role === 'sysadmin';
+  sysSaveBtn.style.display = (isNight && alive && isSysAdmin && !state.me.abilities.sysadminSaveUsed) ? 'inline-block' : 'none';
+  sysKillBtn.style.display = (isNight && alive && isSysAdmin && !state.me.abilities.sysadminKillUsed) ? 'inline-block' : 'none';
 
 
   if (role === 'malware') roleActionBtn.textContent = '🦠 Infect Target';
