@@ -829,7 +829,7 @@ function renderState(nextState, prevPhase = null) {
   // voteBtn.style.display handled above now
   roleActionBtn.style.display = (isNight && alive && ['malware', 'analyst', 'defender', 'logicbomb'].includes(role)) ? 'inline-block' : 'none';
   sysSaveBtn.style.display = (isNight && alive && role === 'sysadmin' && !state.me.abilities.sysadminSaveUsed) ? 'inline-block' : 'none';
-  sysKillBtn.style.display = (isNight && alive && role === 'sysadmin' && !state.me.abilities.syskillUsed) ? 'inline-block' : 'none';
+  sysKillBtn.style.display = (isNight && alive && role === 'sysadmin' && !state.me.abilities.sysadminKillUsed) ? 'inline-block' : 'none';
 
 
   if (role === 'malware') roleActionBtn.textContent = '🦠 Infect Target';
