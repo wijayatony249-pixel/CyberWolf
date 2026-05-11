@@ -58,8 +58,8 @@ const sysKillBtn = document.getElementById('sysKillBtn');
 const statusList = document.getElementById('statusList');
 const setupCard = document.getElementById('setupCard');
 const setupVisibility = document.getElementById('setupVisibility');
-const dayMinutesInput = document.getElementById('dayMinutesInput');
-const nightSecondsInput = document.getElementById('nightSecondsInput');
+const dayMinutesInput = null;
+const nightSecondsInput = null;
 const roleUserInput = document.getElementById('roleUserInput');
 const maxPlayersInput = document.getElementById('maxPlayersInput');
 const saveSetupBtn = document.getElementById('saveSetupBtn');
@@ -857,8 +857,6 @@ function renderState(nextState, prevPhase = null) {
 
   if (state.settings) {
     setupVisibility.value = state.settings.visibility || 'public';
-    if (dayMinutesInput) dayMinutesInput.value = "2.25"; // 135s (90 discussion + 45 voting)
-    if (nightSecondsInput) nightSecondsInput.value = String(state.settings.nightDurationSec || 30);
     if (maxPlayersInput) maxPlayersInput.value = String(state.settings.maxPlayers || 12);
   }
 
@@ -875,15 +873,11 @@ function renderState(nextState, prevPhase = null) {
 
 createBtn.onclick = () => {
   attemptPlayMusic();
-  const dayMinutes = Number(dayMinutesInput.value || 5);
-  const nightSeconds = Number(nightSecondsInput.value || 15);
   const maxPlayers = Number(maxPlayersInput.value || 12);
   socket.emit('room:create', {
     username: usernameInput.value,
     settings: {
       visibility: setupVisibility.value,
-      dayDurationSec: Math.round(dayMinutes * 60),
-      nightDurationSec: nightSeconds,
       maxPlayers: maxPlayers
     }
   });

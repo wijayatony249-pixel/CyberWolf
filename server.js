@@ -106,15 +106,17 @@ function createRoom(roomCode) {
 
 function normalizeRoomSettings(raw) {
   const defaultSettings = {
-    dayDurationSec: CONFIG.dayDurationSec,
     nightDurationSec: CONFIG.nightDurationSec,
+    discussionDurationSec: CONFIG.discussionDurationSec,
+    votingDurationSec: CONFIG.votingDurationSec,
     maxPlayers: CONFIG.maxPlayers,
     visibility: 'public',
   };
   const next = raw || {};
   const parsed = {
-    dayDurationSec: Math.max(30, Math.min(900, Number(next.dayDurationSec) || defaultSettings.dayDurationSec)),
-    nightDurationSec: Math.max(15, Math.min(300, Number(next.nightDurationSec) || defaultSettings.nightDurationSec)),
+    nightDurationSec: defaultSettings.nightDurationSec,
+    discussionDurationSec: defaultSettings.discussionDurationSec,
+    votingDurationSec: defaultSettings.votingDurationSec,
     maxPlayers: Math.max(CONFIG.minPlayers, Math.min(CONFIG.maxPlayers, Number(next.maxPlayers) || defaultSettings.maxPlayers)),
     visibility: String(next.visibility || defaultSettings.visibility) === 'private' ? 'private' : 'public',
   };
