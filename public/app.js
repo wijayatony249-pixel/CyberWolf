@@ -1068,3 +1068,36 @@ renderPublicLobbies();
 fetchHistory(); // load history from Supabase on startup
 // Refresh history every 30 seconds
 setInterval(fetchHistory, 30000);
+
+function phaseText(p) {
+  const map = {
+    lobby: 'RUANG TUNGGU (LOBBY)',
+    night: 'FASE MALAM (AKSI RAHASIA)',
+    resolution: 'RESOLUSI MALAM',
+    discussion: 'FASE DISKUSI',
+    voting: 'FASE VOTING',
+    ended: 'GAME BERAKHIR',
+  };
+  return map[p] || (p ? p.toUpperCase() : 'UNKNOWN');
+}
+
+function buildActionGuide() {
+  if (!state || !state.me) return '';
+  const { phase, me } = state;
+  const { role, alive } = me;
+
+  if (!alive) return '👻 Kamu tereliminasi. Pantau jalannya sistem.';
+  if (phase === 'lobby') return '⏳ Menunggu pemain lain bergabung...';
+  if (phase === 'discussion') return '💬 Diskusikan siapa pelakunya di chat!';
+  if (phase === 'voting') return '🗳️ Waktunya memilih target eksekusi!';
+  
+  if (phase === 'night') {
+    if (role === 'malware') return '🦠 Pilih satu target untuk diinfeksi malam ini.';
+    if (role === 'analyst') return '🕵️ Pilih satu target untuk di-scan statusnya.';
+    if (role === 'defender') return '🛡️ Pilih satu target untuk dilindungi.';
+    if (role === 'logicbomb') return '💣 Kunci target yang akan meledak jika kamu mati.';
+    if (role === 'sysadmin') return '🧑‍💻 Gunakan Restore atau Force Delete jika diperlukan.';
+    return '🛌 Beristirahatlah, role kamu tidak punya aksi malam.';
+  }
+  return 'Menunggu instruksi sistem...';
+}
