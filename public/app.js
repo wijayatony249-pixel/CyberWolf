@@ -517,8 +517,11 @@ function renderPublicLobbies() {
 }
 
 function phaseText(phase) {
-  if (phase === 'day') return 'SIANG - Diskusi & Voting';
-  if (phase === 'night') return 'MALAM - Skill Berjalan';
+  if (phase === 'discussion') return 'DISKUSI - Cari Malware';
+  if (phase === 'voting') return 'VOTING - Pilih Target';
+  if (phase === 'night') return 'MALAM - Aksi Rahasia';
+  if (phase === 'resolving_night') return 'RESOLUSI - Hasil Malam';
+  if (phase === 'resolving_voting') return 'RESOLUSI - Hasil Voting';
   if (phase === 'lobby') return 'LOBBY - Menunggu Pemain';
   if (phase === 'ended') return 'GAME OVER';
   return phase.toUpperCase();
@@ -530,15 +533,17 @@ function buildActionGuide() {
 
   const role = state.me.role;
   if (state.phase === 'lobby') return 'Tunggu pembuat room menekan tombol Mulai Game.';
-  if (state.phase === 'day') return 'Pilih pemain yang kamu curigai, lalu klik Kirim Voting Siang.';
+  if (state.phase === 'discussion') return 'Silakan berdiskusi di chat. Gunakan fase ini untuk menganalisis perilaku pemain.';
+  if (state.phase === 'voting') return 'FASE VOTING: Pilih pemain yang mencurigakan, lalu klik Kirim Voting.';
   if (state.phase === 'night') {
-    if (role === 'malware') return '🦠 Sebagai Malware, pilih target infeksi malam ini.';
-    if (role === 'analyst') return '🕵️ Sebagai Analyst, pilih target untuk discan.';
-    if (role === 'defender') return '🛡️ Sebagai Firewall, pilih target yang mau dilindungi.';
-    if (role === 'sysadmin') return '🧑‍💻 Sebagai System Admin, kamu bisa pakai Restore 1x dan Force Delete 1x.';
-    return 'Kamu tidak punya aksi malam. Tunggu fase siang berikutnya.';
+    if (role === 'malware') return '🦠 Malware: Pilih target infeksi malam ini.';
+    if (role === 'analyst') return '🕵️ Analyst: Pilih target untuk discan.';
+    if (role === 'defender') return '🛡️ Firewall: Pilih target untuk dilindungi.';
+    if (role === 'sysadmin') return '🧑‍💻 SysAdmin: Pantau log atau gunakan skill aktif.';
+    if (role === 'logicbomb') return '💣 Logic Bomb: Kunci target "bom" mu malam ini.';
+    return 'Tunggu fase berikutnya.';
   }
-  if (state.phase === 'ended') return 'Game selesai. Buat room baru untuk ronde berikutnya.';
+  if (state.phase === 'ended') return 'Game selesai.';
   return 'Ikuti instruksi fase yang berjalan.';
 }
 
@@ -597,10 +602,14 @@ function renderState(nextState, prevPhase = null) {
         
         // Remove hidden, add active and appropriate theme
         phaseTransitionOverlay.classList.remove('hidden');
-        phaseTransitionOverlay.className = isNight ? 'phase-transition active' : 'phase-transition morning active';
+        const isNightPhase = nextState.phase === 'night';
+        phaseTransitionOverlay.className = isNightPhase ? 'phase-transition active' : 'phase-transition morning active';
         
         if (phaseTransitionText) {
-          phaseTransitionText.textContent = isNight ? '🌙 Malam Telah Tiba...' : '☀️ Waktu Sudah Pagi...';
+          if (nextState.phase === 'night') phaseTransitionText.textContent = '🌙 Malam Telah Tiba...';
+          else if (nextState.phase === 'discussion') phaseTransitionText.textContent = '☀️ Waktu Sudah Pagi...';
+          else if (nextState.phase === 'voting') phaseTransitionText.textContent = '🗳️ Saatnya Voting!';
+          else phaseTransitionText.textContent = phaseText(nextState.phase);
           // Trigger a re-flow for animation
           phaseTransitionText.style.animation = 'none';
           void phaseTransitionText.offsetWidth;
@@ -677,7 +686,8 @@ function renderState(nextState, prevPhase = null) {
 
   const isCreator = state.me.isCreator;
   const isNight = state.phase === 'night';
-  const isDay = state.phase === 'day';
+  const isVoting = state.phase === 'voting';
+  const isDiscussion = state.phase === 'discussion';
   const isLobby = state.phase === 'lobby';
   const alive = state.me.alive;
   const role = state.me.role;
@@ -747,14 +757,17 @@ function renderState(nextState, prevPhase = null) {
   if (targetLabel) {
     if (!alive) {
       targetLabel.textContent = "👻 Kamu sudah tereliminasi, tidak bisa melakukan aksi.";
-    } else if (isDay) {
-      targetLabel.textContent = "🔴 Pilih siapa yang ingin kamu eksekusi (Voting):";
+    } else if (isDiscussion) {
+      targetLabel.textContent = "💬 Fase Diskusi: Silakan berdiskusi di chat sebelum voting dibuka.";
+    } else if (isVoting) {
+      targetLabel.textContent = "🗳️ Fase Voting: Pilih siapa yang ingin kamu eksekusi:";
     } else if (isNight) {
       if (role === 'malware') targetLabel.textContent = "🦠 Pilih target korban infeksi:";
       else if (role === 'analyst') targetLabel.textContent = "🕵️ Pilih siapa yang ingin di-scan:";
       else if (role === 'defender') targetLabel.textContent = "🛡️ Pilih siapa yang ingin dilindungi:";
       else if (role === 'sysadmin') targetLabel.textContent = "🧑‍💻 Pilih target untuk Restore / Force Delete:";
-      else targetLabel.textContent = "Pilih target (Kamu tidak punya skill di malam hari):";
+      else if (role === 'logicbomb') targetLabel.textContent = "💣 Kunci target yang akan meledak jika kamu mati:";
+      else targetLabel.textContent = "Pilih target (Role kamu tidak punya aksi malam):";
     } else {
       targetLabel.textContent = "Menunggu instruksi selanjutnya...";
     }
@@ -762,14 +775,22 @@ function renderState(nextState, prevPhase = null) {
 
   // Button styling for clarity
   if (voteBtn) {
-    if (isDay && alive) {
+    if (isVoting && alive) {
+      voteBtn.style.display = 'inline-block';
       voteBtn.style.background = 'linear-gradient(90deg, #ff3b5c, #cc0033)';
       voteBtn.style.color = '#fff';
-      voteBtn.textContent = '✅ Konfirmasi Voting Siang';
+      voteBtn.textContent = '✅ Konfirmasi Voting';
     } else {
-      voteBtn.style.background = '';
-      voteBtn.style.color = '';
-      voteBtn.textContent = 'Kirim Voting Siang';
+      voteBtn.style.display = 'none';
+    }
+  }
+
+  if (roleActionBtn) {
+    if (isNight && alive && role !== 'user' && role !== 'sysadmin') {
+      roleActionBtn.style.display = 'inline-block';
+      if (role === 'logicbomb') roleActionBtn.textContent = '💣 Kunci Target Bom';
+    } else {
+      roleActionBtn.style.display = 'none';
     }
   }
 
@@ -836,9 +857,8 @@ function renderState(nextState, prevPhase = null) {
 
   if (state.settings) {
     setupVisibility.value = state.settings.visibility || 'public';
-    if (dayMinutesInput) dayMinutesInput.value = String(Math.round((state.settings.dayDurationSec || 300) / 60) || 5);
-    if (nightSecondsInput) nightSecondsInput.value = String(state.settings.nightDurationSec || 15);
-    if (maxPlayersInput) maxPlayersInput.value = String(state.settings.maxPlayers || 12);
+    if (dayMinutesInput) dayMinutesInput.value = "2.25"; // 135s (90 discussion + 45 voting)
+    if (nightSecondsInput) nightSecondsInput.value = String(state.settings.nightDurationSec || 30);
     if (maxPlayersInput) maxPlayersInput.value = String(state.settings.maxPlayers || 12);
   }
 
@@ -919,6 +939,7 @@ roleActionBtn.onclick = () => {
     malware: 'malware:infect',
     analyst: 'analyst:scan',
     defender: 'defender:protect',
+    logicbomb: 'logicbomb:target',
   };
   const action = roleActionMap[state.me.role];
   if (!action) return;
@@ -1002,6 +1023,15 @@ socket.on('action:logicbomb:available', () => {
   showAlert('💣 Logic Bomb aktif! Pilih target di dropdown lalu klik OK.');
   const targetId = selectedTargetId();
   if (targetId) socket.emit('action:logicbomb:shot', { targetId });
+});
+
+socket.on('action:analyst:result', ({ username, isMalware }) => {
+  const title = isMalware ? '⚠️ ANCAMAN TERDETEKSI' : '✅ TARGET BERSIH';
+  const message = isMalware 
+    ? `Hasil scanning menunjukkan bahwa ${username} adalah MALWARE. Segera koordinasikan dengan tim Security!` 
+    : `Hasil scanning menunjukkan bahwa ${username} adalah Non-Malware (User Biasa/Spesial).`;
+  
+  showAlert(message);
 });
 
 socket.on('error:message', (err) => {

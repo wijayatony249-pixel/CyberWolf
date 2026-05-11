@@ -37,12 +37,13 @@ async function saveGameHistory(room) {
 const CONFIG = {
   minPlayers: 6,
   maxPlayers: 12,
-  dayDurationSec: 60,
-  nightDurationSec: 15,
+  nightDurationSec: 30,
+  discussionDurationSec: 90,
+  votingDurationSec: 45,
 };
 
 const ROLE_LABEL = {
-  malware: '🦠 Malware / Trojan',
+  malware: '🦠 Malware',
   user: '🙂 Regular User',
   analyst: '🕵️ Security Analyst',
   defender: '🛡️ Firewall / Defender',
@@ -50,12 +51,12 @@ const ROLE_LABEL = {
   sysadmin: '🧑‍💻 System Admin',
 };
 const ROLE_DESC = {
-  malware: 'Misi: infeksi 1 target tiap malam sampai jumlah Malware menyamai tim lawan.',
+  malware: 'Misi: infeksi target tiap malam sampai jumlah Malware menyamai tim lawan.',
   user: 'Misi: analisis chat, cari pelaku, dan voting dengan tepat saat siang.',
-  analyst: 'Misi: scan 1 target tiap malam untuk cek Malware / Non-Malware.',
+  analyst: 'Misi: scan 1 target tiap malam untuk cek status Malware.',
   defender: 'Misi: lindungi 1 pemain tiap malam agar kebal serangan Malware.',
-  logicbomb: 'Misi: jika tereliminasi, pilih 1 target agar ikut terhapus.',
-  sysadmin: 'Misi: gunakan 💾 Restore (1x) dan 🔥 Force Delete (1x) di waktu yang tepat.',
+  logicbomb: 'Misi: pilih target bom tiap malam. Jika kamu mati, target tersebut ikut terhapus.',
+  sysadmin: 'Misi: pantau log aktivitas sistem dan gunakan Restore/Force Delete di waktu kritis.',
 };
 
 const rooms = new Map();
@@ -83,6 +84,7 @@ function createRoom(roomCode) {
       defenderTarget: null,
       sysadminSaveTarget: null,
       sysadminKillTarget: null,
+      logicBombTarget: null,
     },
     sysadminUsed: {
       save: false,
@@ -91,8 +93,9 @@ function createRoom(roomCode) {
     pendingHunterShot: null,
     logs: [],
     settings: {
-      dayDurationSec: CONFIG.dayDurationSec,
       nightDurationSec: CONFIG.nightDurationSec,
+      discussionDurationSec: CONFIG.discussionDurationSec,
+      votingDurationSec: CONFIG.votingDurationSec,
       maxPlayers: CONFIG.maxPlayers,
       visibility: 'public',
     },
@@ -307,19 +310,19 @@ function eliminatePlayer(room, targetId, reason) {
   sendLog(room, `${target.username} dieliminasi (${reason}). Role: ${ROLE_LABEL[target.role]}`);
 
   if (target.role === 'logicbomb') {
-    room.pendingHunterShot = target.id;
-    sendLog(room, `${target.username} (Logic Bomb) dapat memilih 1 target untuk ikut terhapus.`);
-    
-    if (target.isBot) {
-      setTimeout(() => simulateBotLogicBomb(room, target), 3000);
-    } else {
-      io.to(target.id).emit('action:logicbomb:available');
+    // New Logic: If they have a pre-set target from the night, use it.
+    const revengeTargetId = room.nightActions.logicBombTarget;
+    if (revengeTargetId) {
+      const revengeTarget = room.players.get(revengeTargetId);
+      if (revengeTarget && revengeTarget.alive) {
+        sendLog(room, `Mekanisme Logic Bomb aktif! ${target.username} membawa ${revengeTarget.username} ikut terhapus.`);
+        // Note: Recursion safety handled by eliminatePlayer's alive check
+        eliminatePlayer(room, revengeTargetId, `efek Logic Bomb dari ${target.username}`);
+      }
     }
   }
 
-  // Ensure win condition is checked whenever someone is eliminated
   checkWinCondition(room);
-
   return target;
 }
 
@@ -363,38 +366,64 @@ function resetNightActions(room) {
   }
 }
 
-function startDay(room) {
-  room.phase = 'day';
+function startDiscussion(room) {
+  room.phase = 'discussion';
   room.round += 1;
   room.dayVotes = new Map();
-  room.phaseEndsAt = Date.now() + room.settings.dayDurationSec * 1000;
-  sendLog(room, `Round ${room.round} dimulai. Fase Siang berjalan.`);
+  room.phaseEndsAt = Date.now() + room.settings.discussionDurationSec * 1000;
+  sendLog(room, `--- FASE DISKUSI DIMULAI (Ronde ${room.round}) ---`);
+  sendLog(room, "Silakan berdiskusi, cari jejak Malware. Voting akan dibuka setelah ini.");
   emitRoomState(room);
 
   clearPhaseTimer(room);
-  room.timer = setTimeout(() => resolveDay(room.code), room.settings.dayDurationSec * 1000);
-
-  simulateBotDayActions(room);
+  room.timer = setTimeout(() => startVoting(room), room.settings.discussionDurationSec * 1000);
 }
 
-function checkDayCompletion(room) {
-  if (room.phase !== 'day') return;
+function startVoting(room) {
+  room.phase = 'voting';
+  room.phaseEndsAt = Date.now() + room.settings.votingDurationSec * 1000;
+  sendLog(room, "--- FASE VOTING DIBUKA ---");
+  sendLog(room, "Pilih pemain yang paling mencurigakan untuk dieliminasi.");
+  emitRoomState(room);
+
+  clearPhaseTimer(room);
+  room.timer = setTimeout(() => resolveVoting(room.code), room.settings.votingDurationSec * 1000);
+  
+  simulateBotDayActions(room); // Bots vote during voting phase
+}
+
+function checkVotingCompletion(room) {
+  if (room.phase !== 'voting') return;
   const aliveCount = alivePlayers(room).length;
   if (room.dayVotes.size >= aliveCount) {
-    resolveDay(room.code);
+    resolveVoting(room.code);
   }
 }
 
-function resolveDay(roomCode) {
+async function resolveVoting(roomCode) {
   const room = rooms.get(roomCode);
-  if (!room || room.phase !== 'day') return;
+  if (!room || room.phase !== 'voting') return;
+
+  room.phase = 'resolving_voting';
+  clearPhaseTimer(room);
+  emitRoomState(room);
+
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  sendLog(room, "--- VOTING BERAKHIR. MENGHITUNG SUARA... ---");
+  await sleep(2000);
 
   const eligible = new Set(alivePlayers(room).map((p) => p.id));
   const executedId = majorityVote(room.dayVotes, eligible);
+
   if (executedId) {
+    const target = room.players.get(executedId);
+    sendLog(room, `Hasil voting mayoritas: Node ${target.username} akan dieliminasi.`);
+    await sleep(2500);
     eliminatePlayer(room, executedId, 'voting siang');
+    await sleep(2000);
   } else {
-    sendLog(room, 'Voting siang tidak menghasilkan mayoritas. Tidak ada yang dieliminasi.');
+    sendLog(room, 'Hasil voting seri atau tidak ada mayoritas. Tidak ada eliminasi ronde ini.');
+    await sleep(2000);
   }
 
   if (checkWinCondition(room)) return;
@@ -418,80 +447,122 @@ function checkNightCompletion(room) {
   if (room.phase !== 'night') return;
   const aliveList = alivePlayers(room);
 
-  // Malware MUST vote (required action)
+  // 1. Malware MUST all vote
   const malwares = aliveList.filter(p => p.role === 'malware');
   if (malwares.length > 0 && room.nightActions.malwareVotes.size < malwares.length) return;
 
-  // Analyst MUST scan (required action)
+  // 2. Analyst MUST scan
   const analysts = aliveList.filter(p => p.role === 'analyst');
   if (analysts.length > 0 && !room.nightActions.analystTarget) return;
 
-  // Defender MUST protect (required action)
+  // 3. Defender MUST protect
   const defenders = aliveList.filter(p => p.role === 'defender');
   if (defenders.length > 0 && !room.nightActions.defenderTarget) return;
 
-  // Sysadmin skills are OPTIONAL - do NOT block phase completion
+  // 4. Logic Bomb MUST pick a target (new requirement)
+  const logicbombs = aliveList.filter(p => p.role === 'logicbomb');
+  if (logicbombs.length > 0 && !room.nightActions.logicBombTarget) return;
+
+  // 5. Sysadmin - Wait if they have skills left
+  const sysadmins = aliveList.filter(p => p.role === 'sysadmin');
+  if (sysadmins.length > 0) {
+    const canSave = !room.sysadminUsed.save;
+    const canKill = !room.sysadminUsed.kill;
+    const usedSaveThisNight = !!room.nightActions.sysadminSaveTarget;
+    const usedKillThisNight = !!room.nightActions.sysadminKillTarget;
+    if ((canSave && !usedSaveThisNight) || (canKill && !usedKillThisNight)) {
+      return;
+    }
+  }
 
   resolveNight(room.code);
 }
 
-function resolveNight(roomCode) {
+async function resolveNight(roomCode) {
   const room = rooms.get(roomCode);
   if (!room || room.phase !== 'night') return;
 
-  const aliveIds = new Set(alivePlayers(room).map((p) => p.id));
+  // Transition to a internal resolving state to prevent duplicate triggers
+  room.phase = 'resolving_night';
+  clearPhaseTimer(room);
+  emitRoomState(room);
 
+  const aliveIds = new Set(alivePlayers(room).map((p) => p.id));
   const malwareTargetId = majorityVote(room.nightActions.malwareVotes, aliveIds);
   const defenderTarget = room.nightActions.defenderTarget;
+  const analystTarget = room.nightActions.analystTarget;
+  const saveId = room.nightActions.sysadminSaveTarget;
+  const killId = room.nightActions.sysadminKillTarget;
+
+  // Process Defender protection internally
   if (defenderTarget && aliveIds.has(defenderTarget)) {
     const defenderProtected = room.players.get(defenderTarget);
     if (defenderProtected) defenderProtected.protected = true;
   }
 
-  if (room.nightActions.analystTarget) {
-    const target = room.players.get(room.nightActions.analystTarget);
+  // Dramatic sequence helper
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  sendLog(room, "--- SISTEM SEDANG MEMPROSES AKTIVITAS MALAM ---");
+  await sleep(2000);
+
+  // 1. Analyst Results (More dramatic and clear)
+  if (analystTarget) {
+    const target = room.players.get(analystTarget);
     const analysts = aliveByRole(room, 'analyst');
-    for (const analyst of analysts) {
-      if (target) {
-        sendLog(
-          room,
-          `Hasil scanning: ${target.username} terdeteksi sebagai ${target.role === 'malware' ? 'Malware' : 'Non-Malware'}.`,
-          { visibility: 'private', targetSocketId: analyst.id }
-        );
+    if (target) {
+      const resultText = `[SCAN REPORT] Node: ${target.username} | Status: ${target.role === 'malware' ? '⚠️ MALWARE DETECTED' : '✅ CLEAN'}`;
+      for (const analyst of analysts) {
+        sendLog(room, resultText, { visibility: 'private', targetSocketId: analyst.id });
+        io.to(analyst.id).emit('action:analyst:result', { username: target.username, isMalware: target.role === 'malware' });
       }
+      await sleep(2000);
     }
   }
 
+  // 2. Sysadmin System Logs (New feature)
+  const sysadmins = aliveByRole(room, 'sysadmin');
+  if (sysadmins.length > 0) {
+    const logs = [];
+    if (malwareTargetId) logs.push("Deteksi aktivitas intrusi ilegal.");
+    if (defenderTarget) logs.push("Firewall melakukan shielding pada satu node.");
+    if (analystTarget) logs.push("Analyst melakukan sniffing data paket.");
+    
+    const logSummary = `[SYS LOG] ${logs.length > 0 ? logs.join(' ') : 'Tidak ada aktivitas mencurigakan.'}`;
+    for (const sys of sysadmins) {
+      sendLog(room, logSummary, { visibility: 'private', targetSocketId: sys.id });
+    }
+    await sleep(1500);
+  }
+
+  // 3. Malware Attack Sequence
   let killedByMalwareId = null;
   if (malwareTargetId) {
+    sendLog(room, "Mendeteksi upaya infeksi Malware pada jaringan...");
+    await sleep(2500);
     const target = room.players.get(malwareTargetId);
     if (target && target.alive) {
       if (target.protected) {
-        sendLog(room, `${target.username} menjadi target serangan Malware, namun berhasil dilindungi Firewall.`);
+        sendLog(room, `Firewall berhasil memblokir serangan pada ${target.username}!`);
+      } else if (saveId === target.id) {
+        sendLog(room, `System Admin melakukan Restore pada ${target.username}. Infeksi digagalkan.`);
       } else {
         killedByMalwareId = target.id;
+        sendLog(room, `Node ${target.username} telah terinfeksi.`);
       }
     }
+    await sleep(2000);
   }
 
-  const saveId = room.nightActions.sysadminSaveTarget;
-  const killId = room.nightActions.sysadminKillTarget;
+  // Finalize eliminations
+  if (killedByMalwareId) eliminatePlayer(room, killedByMalwareId, 'serangan Malware malam');
+  if (killId) eliminatePlayer(room, killId, 'Force Delete oleh System Admin');
 
-  if (killedByMalwareId && saveId === killedByMalwareId) {
-    killedByMalwareId = null;
-    sendLog(room, `System Admin menggunakan Restore untuk menyelamatkan target serangan malam.`);
-  }
-
-  if (killedByMalwareId) {
-    eliminatePlayer(room, killedByMalwareId, 'serangan Malware malam');
-  }
-
-  if (killId) {
-    eliminatePlayer(room, killId, 'Force Delete oleh System Admin');
-  }
+  sendLog(room, "Transisi ke mode operasional siang hari...");
+  await sleep(1500);
 
   if (checkWinCondition(room)) return;
-  startDay(room);
+  startDiscussion(room);
 }
 
 function assignRoles(room) {
@@ -1010,7 +1081,7 @@ io.on('connection', (socket) => {
   socket.on('vote:day', ({ targetId }) => {
     const roomCode = socket.data.roomCode;
     const room = rooms.get(roomCode);
-    if (!room || room.phase !== 'day') return;
+    if (!room || room.phase !== 'voting') return;
 
     const me = room.players.get(socket.id);
     const target = room.players.get(targetId);
@@ -1020,7 +1091,7 @@ io.on('connection', (socket) => {
     room.dayVotes.set(me.id, target.id);
     sendLog(room, `${me.username} telah memasukkan voting.`);
     emitRoomState(room);
-    checkDayCompletion(room);
+    checkVotingCompletion(room);
   });
 
   socket.on('action:night', ({ action, targetId }) => {
@@ -1061,6 +1132,11 @@ io.on('connection', (socket) => {
       sendLog(room, `${me.username} menyiapkan Force Delete.`, { visibility: 'private', targetSocketId: me.id });
     }
 
+    if (action === 'logicbomb:target' && me.role === 'logicbomb') {
+      room.nightActions.logicBombTarget = target.id;
+      sendLog(room, `Target bom dikunci pada ${target.username}.`, { visibility: 'private', targetSocketId: me.id });
+    }
+
     emitRoomState(room);
     checkNightCompletion(room);
   });
@@ -1078,9 +1154,14 @@ io.on('connection', (socket) => {
     if (!target || !target.alive) return;
 
     room.pendingHunterShot = null;
-    eliminatePlayer(room, target.id, `efek Logic Bomb dari ${me.username}`);
-    checkWinCondition(room);
-    emitRoomState(room);
+    
+    // Add delay for Logic Bomb effect
+    sendLog(room, `Logic Bomb ${me.username} sedang menargetkan sistem balik...`);
+    setTimeout(() => {
+      eliminatePlayer(room, target.id, `efek Logic Bomb dari ${me.username}`);
+      checkWinCondition(room);
+      emitRoomState(room);
+    }, 2500);
   });
 
   socket.on('disconnect', () => {
