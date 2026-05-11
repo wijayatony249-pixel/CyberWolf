@@ -58,7 +58,6 @@ const sysKillBtn = document.getElementById('sysKillBtn');
 const statusList = document.getElementById('statusList');
 const setupCard = document.getElementById('setupCard');
 const setupVisibility = document.getElementById('setupVisibility');
-const roleAvatarIcon = document.getElementById('idleAvatar'); // Reusing existing element or mapping correctly
 const roleAvatarContainer = document.getElementById('roleArticle');
 const dayMinutesInput = null;
 const nightSecondsInput = null;
@@ -670,24 +669,28 @@ function renderState(nextState, prevPhase = null) {
   }
 
   state = nextState;
-  roomLabel.textContent = `ROOM: ${state.code}`;
+  if (roomLabel) roomLabel.textContent = `ROOM: ${state.code}`;
   if (copyRoomBtn) copyRoomBtn.disabled = !state.code;
-  meLabel.textContent = `${state.me.username} | Role: ${state.me.roleLabel} | ${state.me.alive ? 'ALIVE' : 'ELIMINATED'}`;
-  roleDesc.textContent = `📌 ${state.me.roleDesc || ''}`;
-  missionHint.textContent = buildActionGuide();
-  phaseLabel.textContent = phaseText(state.phase);
-  actionHelp.textContent = buildActionGuide();
+  if (meLabel) meLabel.textContent = `${state.me.username} | Role: ${state.me.roleLabel} | ${state.me.alive ? 'ALIVE' : 'ELIMINATED'}`;
+  if (roleDesc) roleDesc.textContent = `📌 ${state.me.roleDesc || ''}`;
+  if (missionHint) missionHint.textContent = buildActionGuide();
+  if (phaseLabel) phaseLabel.textContent = phaseText(state.phase);
+  if (actionHelp) actionHelp.textContent = buildActionGuide();
 
   // Set Role Avatar
   if (state.me && state.started && state.phase !== 'ended') {
     const roleId = state.me.role;
-    roleAvatarIcon.textContent = ROLE_EMOJIS[roleId] || '🐺';
-    roleAvatarIcon.className = `avatar-${roleId}`;
-    roleAvatarContainer.style.display = 'flex';
+    if (idleAvatar) {
+      idleAvatar.textContent = ROLE_EMOJIS[roleId] || '🐺';
+      idleAvatar.className = `idle-avatar avatar-${roleId}`;
+    }
+    if (roleAvatarContainer) roleAvatarContainer.style.display = 'flex';
   } else {
-    roleAvatarIcon.textContent = '👤';
-    roleAvatarIcon.className = '';
-    roleAvatarContainer.style.display = 'none';
+    if (idleAvatar) {
+      idleAvatar.textContent = '👤';
+      idleAvatar.className = 'idle-avatar';
+    }
+    if (roleAvatarContainer) roleAvatarContainer.style.display = 'none';
   }
 
   const isCreator = state.me.isCreator;
