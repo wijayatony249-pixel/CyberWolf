@@ -585,7 +585,7 @@ function renderState(nextState, prevPhase = null) {
   }
 
   // Phase Transition Overlays + Music switch
-  if (prevPhase !== nextState.phase) {
+  if (oldPhase !== nextState.phase) {
 
     const isNight = nextState.phase === 'night';
     const isDay = nextState.phase === 'day';
@@ -598,24 +598,28 @@ function renderState(nextState, prevPhase = null) {
     }, transitionDelay);
 
     // Handle Phase Overlay
-    if (isNight || isDay) {
+    if (isNight || nextState.phase === 'discussion' || nextState.phase === 'voting') {
       setTimeout(() => {
         if (!phaseTransitionOverlay) return;
         
         // Remove hidden, add active and appropriate theme
         phaseTransitionOverlay.classList.remove('hidden');
-        const isNightPhase = nextState.phase === 'night';
-        phaseTransitionOverlay.className = isNightPhase ? 'phase-transition active' : 'phase-transition morning active';
+        let themeClass = 'night';
+        if (nextState.phase === 'discussion') themeClass = 'morning';
+        if (nextState.phase === 'voting') themeClass = 'voting';
+        
+        phaseTransitionOverlay.className = `phase-transition active ${themeClass}`;
         
         if (phaseTransitionText) {
           if (nextState.phase === 'night') phaseTransitionText.textContent = '🌙 Malam Telah Tiba...';
           else if (nextState.phase === 'discussion') phaseTransitionText.textContent = '☀️ Waktu Sudah Pagi...';
           else if (nextState.phase === 'voting') phaseTransitionText.textContent = '🗳️ Saatnya Voting!';
           else phaseTransitionText.textContent = phaseText(nextState.phase);
+          
           // Trigger a re-flow for animation
           phaseTransitionText.style.animation = 'none';
           void phaseTransitionText.offsetWidth;
-          phaseTransitionText.style.animation = 'phaseTextScale 3s forwards ease-out';
+          phaseTransitionText.style.animation = 'glitchText 1.5s ease-out';
         }
 
         // Hide after 3.5 seconds
