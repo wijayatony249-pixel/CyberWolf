@@ -289,6 +289,38 @@ button:disabled {
   100% { transform: translate(0); }
 }
 
+.phase-badge {
+  min-width: 210px;
+  text-align: right;
+  background: rgba(3, 14, 29, 0.74);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+
+.phase-badge p {
+  margin: 6px 0;
+}
+
+.toolbar {
+  margin: 10px 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.toolbar button {
+  width: auto;
+  flex: 1;
+  min-width: 140px;
+}
+
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
 .panel-block {
   background: var(--panel);
   border: 1px solid var(--line-soft);
