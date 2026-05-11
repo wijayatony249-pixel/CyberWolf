@@ -702,7 +702,7 @@ function renderState(nextState, prevPhase = null) {
       malware: '🦠', analyst: '🕵️', defender: '🛡️',
       logicbomb: '💣', sysadmin: '🧑‍💻', user: '🙂',
     };
-    const phaseHint = isDay ? 'Kandidat Eksekusi' : isNight ? 'Target Malam' : 'Agent';
+    const phaseHint = (isVoting || isDiscussion) ? 'Kandidat Eksekusi' : isNight ? 'Target Malam' : 'Agent';
 
     const targets = state.players.filter(p => p.alive && p.id !== state.me.id);
 
