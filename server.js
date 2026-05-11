@@ -447,6 +447,13 @@ function startNight(room) {
 
 function checkNightCompletion(room) {
   if (room.phase !== 'night') return;
+  
+  // If time is up, resolve immediately regardless of bot completion
+  if (Date.now() >= room.phaseEndsAt) {
+      resolveNight(room.code);
+      return;
+  }
+
   const aliveList = alivePlayers(room);
 
   // 1. Malware MUST all vote
@@ -459,11 +466,13 @@ function checkNightCompletion(room) {
 
   // 3. Defender MUST protect
   const defenders = aliveList.filter(p => p.role === 'defender');
-  if (defenders.length > 0 && !room.nightActions.defenderTarget) return;
+  const defendersActed = defenders.every(p => !!room.nightActions.defenderTarget);
+  if (defenders.length > 0 && !defendersActed) return;
 
-  // 4. Logic Bomb MUST pick a target (new requirement)
+  // 4. Logic Bomb MUST pick a target
   const logicbombs = aliveList.filter(p => p.role === 'logicbomb');
-  if (logicbombs.length > 0 && !room.nightActions.logicBombTarget) return;
+  const logicbombsActed = logicbombs.every(p => !!room.nightActions.logicBombTarget);
+  if (logicbombs.length > 0 && !logicbombsActed) return;
 
   // 5. Sysadmin - Wait if they have skills left
   const sysadmins = aliveList.filter(p => p.role === 'sysadmin');
@@ -663,7 +672,7 @@ function simulateBotDayActions(room) {
     // Random chat
     if (Math.random() > 0.5) {
       setTimeout(() => {
-        if (room.phase !== 'day' || !bot.alive) return;
+        if (!['discussion', 'voting'].includes(room.phase) || !bot.alive) return;
         let text = BOT_CHAT_TEMPLATES[Math.floor(Math.random() * BOT_CHAT_TEMPLATES.length)];
         const randomTarget = botRandomPick(aliveIds, bot.id);
         if (randomTarget) {
@@ -680,13 +689,13 @@ function simulateBotDayActions(room) {
 
     // Voting
     setTimeout(() => {
-      if (room.phase !== 'day' || !bot.alive) return;
+      if (room.phase !== 'voting' || !bot.alive) return;
       const targetId = botRandomPick(aliveIds, bot.id);
       if (targetId) {
         room.dayVotes.set(bot.id, targetId);
         sendLog(room, `${bot.username} telah memasukkan voting.`);
         emitRoomState(room);
-        checkDayCompletion(room);
+        checkVotingCompletion(room);
       }
     }, (Math.random() * 8000) + 5000);
   });
@@ -713,6 +722,13 @@ function simulateBotNightActions(room) {
       else if (bot.role === 'defender') {
         const targetId = botRandomPick(aliveIds); // can protect themselves
         if (targetId) room.nightActions.defenderTarget = targetId;
+      }
+      else if (bot.role === 'logicbomb') {
+        const targetId = botRandomPick(aliveIds, bot.id);
+        if (targetId) {
+          room.nightActions.logicBombTarget = targetId;
+          console.log(`[Bot] Logic Bomb ${bot.username} set target to ${targetId}`);
+        }
       }
       else if (bot.role === 'sysadmin') {
         // 50% chance to use Restore on a random ally (save skill - helpful)
