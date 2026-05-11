@@ -363,6 +363,7 @@ function resetNightActions(room) {
     defenderTarget: null,
     sysadminSaveTarget: null,
     sysadminKillTarget: null,
+    logicBombTarget: null,
   };
   for (const p of room.players.values()) {
     p.protected = false;
@@ -948,19 +949,12 @@ io.on('connection', (socket) => {
     }
 
     const nextSettings = normalizeRoomSettings(payload || {});
-    const referencePlayerCount = Math.max(room.players.size || 0, CONFIG.minPlayers);
-    const roleConfigError = validateRoleConfig(nextSettings, referencePlayerCount);
-    if (roleConfigError) {
-      socket.emit('error:message', roleConfigError);
-      return;
-    }
-
     room.settings = nextSettings;
     sendLog(
       room,
-      `${me.username} mengubah setting game: akses ${room.settings.visibility}, durasi siang ${Math.floor(
-        room.settings.dayDurationSec / 60
-      )} menit, role dikustomisasi.`
+      `${me.username} mengubah setting game: akses ${room.settings.visibility}, durasi diskusi ${Math.floor(
+        room.settings.discussionDurationSec / 60
+      )} menit.`
     );
     emitRoomState(room);
     emitPublicLobbyList();

@@ -422,11 +422,11 @@ function joinRoom(roomCode) {
   const code = String(roomCode || roomCodeInput.value || '').trim();
   const username = String(usernameInput.value || '').trim();
   if (!username) {
-    alert('Nama agent wajib diisi sebelum bergabung ke lobby.');
+    showAlert('Nama agent wajib diisi sebelum bergabung ke lobby.');
     return;
   }
   if (!code) {
-    alert('Token room wajib diisi untuk bergabung ke lobby.');
+    showAlert('Token room wajib diisi untuk bergabung ke lobby.');
     return;
   }
   roomCodeInput.value = code;
@@ -824,8 +824,7 @@ function renderState(nextState, prevPhase = null) {
     }
   }
 
-    // (target list built above via custom cards)
-  }
+  // (target list built above via custom cards)
 
   startBtn.style.display = isCreator && !state.started ? 'inline-block' : 'none';
   addBotBtn.style.display = isCreator && isLobby ? 'inline-block' : 'none';
@@ -1038,12 +1037,16 @@ socket.on('action:logicbomb:available', () => {
 });
 
 socket.on('action:analyst:result', ({ username, isMalware }) => {
-  const title = isMalware ? '⚠️ ANCAMAN TERDETEKSI' : '✅ TARGET BERSIH';
   const message = isMalware 
     ? `Hasil scanning menunjukkan bahwa ${username} adalah MALWARE. Segera koordinasikan dengan tim Security!` 
     : `Hasil scanning menunjukkan bahwa ${username} adalah Non-Malware (User Biasa/Spesial).`;
   
   showAlert(message);
+});
+
+// Game narrative logs from server (eliminations, voting results, night events)
+socket.on('log:new', (message) => {
+  if (chatBox) appendBox(chatBox, `[SYS] ${message}`);
 });
 
 socket.on('error:message', (err) => {
@@ -1072,36 +1075,3 @@ renderPublicLobbies();
 fetchHistory(); // load history from Supabase on startup
 // Refresh history every 30 seconds
 setInterval(fetchHistory, 30000);
-
-function phaseText(p) {
-  const map = {
-    lobby: 'RUANG TUNGGU (LOBBY)',
-    night: 'FASE MALAM (AKSI RAHASIA)',
-    resolution: 'RESOLUSI MALAM',
-    discussion: 'FASE DISKUSI',
-    voting: 'FASE VOTING',
-    ended: 'GAME BERAKHIR',
-  };
-  return map[p] || (p ? p.toUpperCase() : 'UNKNOWN');
-}
-
-function buildActionGuide() {
-  if (!state || !state.me) return '';
-  const { phase, me } = state;
-  const { role, alive } = me;
-
-  if (!alive) return '👻 Kamu tereliminasi. Pantau jalannya sistem.';
-  if (phase === 'lobby') return '⏳ Menunggu pemain lain bergabung...';
-  if (phase === 'discussion') return '💬 Diskusikan siapa pelakunya di chat!';
-  if (phase === 'voting') return '🗳️ Waktunya memilih target eksekusi!';
-  
-  if (phase === 'night') {
-    if (role === 'malware') return '🦠 Pilih satu target untuk diinfeksi malam ini.';
-    if (role === 'analyst') return '🕵️ Pilih satu target untuk di-scan statusnya.';
-    if (role === 'defender') return '🛡️ Pilih satu target untuk dilindungi.';
-    if (role === 'logicbomb') return '💣 Kunci target yang akan meledak jika kamu mati.';
-    if (role === 'sysadmin') return '🧑‍💻 Gunakan Restore atau Force Delete jika diperlukan.';
-    return '🛌 Beristirahatlah, role kamu tidak punya aksi malam.';
-  }
-  return 'Menunggu instruksi sistem...';
-}
