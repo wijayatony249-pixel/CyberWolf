@@ -140,6 +140,7 @@ function roomViewForPlayer(room, socketId) {
     id: p.id,
     username: p.username,
     alive: p.alive,
+    isCreator: p.isCreator,
     eliminatedRound: p.eliminatedRound,
   }));
   const alive = players.filter((p) => p.alive);
