@@ -751,14 +751,19 @@ function simulateBotNightActions(room) {
 
 // === ROUTE HANDLERS ===
 
-// Landing Page Route
-app.get('/landing', (req, res) => {
+// Landing Page Route (Root)
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'landing.html'));
 });
 
 // Gameplay Route
-app.get('/', (req, res) => {
+app.get('/operation', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Backward compatibility or direct access
+app.get('/landing', (req, res) => {
+  res.redirect('/');
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
