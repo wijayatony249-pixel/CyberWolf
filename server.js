@@ -38,8 +38,8 @@ const CONFIG = {
   minPlayers: 6,
   maxPlayers: 12,
   nightDurationSec: 30,
-  discussionDurationSec: 90,
-  votingDurationSec: 45,
+  discussionDurationSec: 30,
+  votingDurationSec: 30,
 };
 
 const ROLE_LABEL = {
@@ -969,9 +969,7 @@ io.on('connection', (socket) => {
     room.settings = nextSettings;
     sendLog(
       room,
-      `${me.username} mengubah setting game: akses ${room.settings.visibility}, durasi diskusi ${Math.floor(
-        room.settings.discussionDurationSec / 60
-      )} menit.`
+      `${me.username} mengubah setting game: akses ${room.settings.visibility}, durasi diskusi ${room.settings.discussionDurationSec} detik.`
     );
     emitRoomState(room);
     emitPublicLobbyList();
