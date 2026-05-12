@@ -1,3 +1,13 @@
+// === AUTO REDIRECT TO LANDING FOR FIRST-TIME VISITORS ===
+(function () {
+  const hasSeenLanding = localStorage.getItem('hasSeenLanding');
+  if (!hasSeenLanding) {
+    localStorage.setItem('hasSeenLanding', 'true');
+    window.location.href = '/landing';
+    return;
+  }
+})();
+
 const socket = io();
 
 const joinCard = document.getElementById('joinCard');
@@ -43,7 +53,7 @@ const idleAvatar = document.getElementById('idleAvatar');
 const phaseTransitionOverlay = document.getElementById('phaseTransitionOverlay');
 const phaseTransitionText = document.getElementById('phaseTransitionText');
 const bgMusicLobby = document.getElementById('bgMusicLobby');
-const bgMusicDay   = document.getElementById('bgMusicDay');
+const bgMusicDay = document.getElementById('bgMusicDay');
 const bgMusicNight = document.getElementById('bgMusicNight');
 const muteToggle = document.getElementById('muteToggle');
 const targetLabel = document.getElementById('targetLabel');
@@ -83,10 +93,10 @@ const malwareSuccessScene = document.getElementById('malwareSuccessScene');
 const malwareDeletedScene = document.getElementById('malwareDeletedScene');
 
 const gameOverOverlay = document.getElementById('gameOverOverlay');
-const gameOverIcon    = document.getElementById('gameOverIcon');
-const gameOverTitle   = document.getElementById('gameOverTitle');
-const gameOverDesc    = document.getElementById('gameOverDesc');
-const gameOverBtn     = document.getElementById('gameOverBtn');
+const gameOverIcon = document.getElementById('gameOverIcon');
+const gameOverTitle = document.getElementById('gameOverTitle');
+const gameOverDesc = document.getElementById('gameOverDesc');
+const gameOverBtn = document.getElementById('gameOverBtn');
 
 let state = null;
 let timerInterval = null;
@@ -120,20 +130,20 @@ function stopAllMusic() {
 
 function playMusic(audioEl) {
   if (!audioEl || isMuted) return;
-  
+
   // REALLY Stop everything else
-  allMusics.forEach(a => { 
-    if (a && a !== audioEl) { 
-      a.pause(); 
-      a.currentTime = 0; 
-    } 
+  allMusics.forEach(a => {
+    if (a && a !== audioEl) {
+      a.pause();
+      a.currentTime = 0;
+    }
   });
 
   // Don't restart if it's already this track playing
   if (currentMusic === audioEl && !audioEl.paused) return;
-  
+
   console.log("Playing track:", audioEl.id);
-  
+
   currentMusic = audioEl;
   audioEl.currentTime = 0;
   const playPromise = audioEl.play();
@@ -147,9 +157,9 @@ function playMusic(audioEl) {
 function switchMusicForPhase(phase) {
   console.log("Switching music for phase:", phase);
   if (phase === 'lobby' || !phase) playMusic(bgMusicLobby);
-  else if (phase === 'day')        playMusic(bgMusicDay);
-  else if (phase === 'night')      playMusic(bgMusicNight);
-  else if (phase === 'ended')      stopAllMusic();
+  else if (phase === 'day') playMusic(bgMusicDay);
+  else if (phase === 'night') playMusic(bgMusicNight);
+  else if (phase === 'ended') stopAllMusic();
 }
 
 
@@ -266,8 +276,8 @@ function showGameOver(winner) {
         gameOverOverlay.className = `game-over-overlay ${isMalwareWin ? 'malware-wins' : 'security-wins'}`;
         if (gameOverIcon) gameOverIcon.textContent = isMalwareWin ? '🦠' : '🛡️';
         if (gameOverTitle) gameOverTitle.textContent = isMalwareWin ? '🚨 Malware Menang!' : '✅ Malware Telah Dikalahkan!';
-        if (gameOverDesc) gameOverDesc.textContent = isMalwareWin 
-          ? 'Malware berhasil mengeliminasi seluruh tim Security. Sistem telah dikompromikan sepenuhnya.' 
+        if (gameOverDesc) gameOverDesc.textContent = isMalwareWin
+          ? 'Malware berhasil mengeliminasi seluruh tim Security. Sistem telah dikompromikan sepenuhnya.'
           : 'Tim Security berhasil memberantas semua Malware. Jaringan aman kembali!';
       }
     }, modalDelay);
@@ -325,7 +335,7 @@ function triggerSecurityVictoryScene() {
 
 function triggerMalwareSuccessScene() {
   if (malwareSuccessScene) malwareSuccessScene.classList.remove('hidden');
-  
+
   // Play Malware Victory Sound
   const sound = new Audio('/audio/malware_win.mp3');
   sound.volume = 0.6;
@@ -341,10 +351,10 @@ function triggerMalwareVictoryScene() {
   if (!malwareErrorScene) return;
   malwareErrorScene.classList.remove('hidden');
   document.body.classList.add('glitch-active');
-  
+
   let boxCount = 0;
   const maxBoxes = 15;
-  
+
   const spawnInterval = setInterval(() => {
     if (boxCount >= maxBoxes) {
       clearInterval(spawnInterval);
@@ -354,7 +364,7 @@ function triggerMalwareVictoryScene() {
       }, 2500);
       return;
     }
-    
+
     createXPErrorBox();
     boxCount++;
   }, 350);
@@ -368,17 +378,17 @@ function createXPErrorBox() {
   sound.volume = 0.5;
   sound.play().catch(e => console.log('SFX blocked:', e));
 
-  
+
   const box = document.createElement('div');
   box.className = 'xp-error-box';
-  
+
   // Random position within safe bounds
   const x = Math.random() * (window.innerWidth - 340);
   const y = Math.random() * (window.innerHeight - 220);
   box.style.left = `${x}px`;
   box.style.top = `${y}px`;
   box.style.zIndex = 10000 + (errorBoxContainer ? errorBoxContainer.children.length : 0);
-  
+
   box.innerHTML = `
     <div class="xp-error-title">
       <span>System Critical Error</span>
@@ -392,10 +402,10 @@ function createXPErrorBox() {
       <button class="xp-button">OK</button>
     </div>
   `;
-  
+
   box.querySelector('.xp-button').onclick = () => box.remove();
   box.querySelector('.xp-error-close').onclick = () => box.remove();
-  
+
   if (errorBoxContainer) errorBoxContainer.appendChild(box);
 }
 
@@ -551,19 +561,19 @@ function buildActionGuide() {
 function showRoleReveal(roleId, roleLabel, roleDescText) {
   revealRoleName.textContent = roleLabel;
   revealRoleDesc.textContent = roleDescText;
-  
+
   const icon = ROLE_EMOJIS[roleId] || '🐺';
   revealRoleIcon.textContent = icon;
-  
+
   // Set modal animation classes
   roleRevealModal.classList.remove('hidden');
   roleRevealModal.classList.remove('reveal-animate');
-  
+
   // Trigger animation after a brief delay
   setTimeout(() => {
     roleRevealModal.classList.add('reveal-animate');
   }, 100);
-  
+
   // Hide modal after 4 seconds
   setTimeout(() => {
     roleRevealModal.classList.add('hidden');
@@ -600,21 +610,21 @@ function renderState(nextState, prevPhase = null) {
     if (isNight || nextState.phase === 'discussion' || nextState.phase === 'voting') {
       setTimeout(() => {
         if (!phaseTransitionOverlay) return;
-        
+
         // Remove hidden, add active and appropriate theme
         phaseTransitionOverlay.classList.remove('hidden');
         let themeClass = 'night';
         if (nextState.phase === 'discussion') themeClass = 'morning';
         if (nextState.phase === 'voting') themeClass = 'voting';
-        
+
         phaseTransitionOverlay.className = `phase-transition active ${themeClass}`;
-        
+
         if (phaseTransitionText) {
           if (nextState.phase === 'night') phaseTransitionText.textContent = '🌙 Malam Telah Tiba...';
           else if (nextState.phase === 'discussion') phaseTransitionText.textContent = '☀️ Waktu Sudah Pagi...';
           else if (nextState.phase === 'voting') phaseTransitionText.textContent = '🗳️ Saatnya Voting!';
           else phaseTransitionText.textContent = phaseText(nextState.phase);
-          
+
           // Trigger a re-flow for animation
           phaseTransitionText.style.animation = 'none';
           void phaseTransitionText.offsetWidth;
@@ -702,13 +712,13 @@ function renderState(nextState, prevPhase = null) {
   const role = state.me.role;
 
   if (playersEl) playersEl.innerHTML = '';
-  
+
   // 1. Populate Players List First (High Priority)
   if (playersEl && nextState.players) {
     for (const p of nextState.players) {
       const li = document.createElement('li');
       li.textContent = `${p.username} ${p.alive ? 'online' : 'tereliminasi'}`;
-      
+
       if (isLobby && isCreator && p.id !== nextState.me.id) {
         const kickBtn = document.createElement('button');
         kickBtn.className = 'btn-kick';
@@ -839,10 +849,10 @@ function renderState(nextState, prevPhase = null) {
 
   // Visibility logic for buttons
   voteBtn.style.display = isVoting ? 'inline-block' : 'none';
-  
+
   const canActAtNight = isNight && alive && ['malware', 'analyst', 'defender', 'logicbomb'].includes(role);
   roleActionBtn.style.display = canActAtNight ? 'inline-block' : 'none';
-  
+
   const isSysAdmin = role === 'sysadmin';
   sysSaveBtn.style.display = (isNight && alive && isSysAdmin && !state.me.abilities.sysadminSaveUsed) ? 'inline-block' : 'none';
   sysKillBtn.style.display = (isNight && alive && isSysAdmin && !state.me.abilities.sysadminKillUsed) ? 'inline-block' : 'none';
@@ -898,7 +908,7 @@ createBtn.onclick = () => {
 
   attemptPlayMusic();
   const maxPlayers = Number(maxPlayersInput.value || 12);
-  
+
   console.log("Emitting room:create", { username, maxPlayers });
   socket.emit('room:create', {
     username: username,
@@ -1046,10 +1056,10 @@ socket.on('action:logicbomb:available', () => {
 });
 
 socket.on('action:analyst:result', ({ username, isMalware }) => {
-  const message = isMalware 
-    ? `Hasil scanning menunjukkan bahwa ${username} adalah MALWARE. Segera koordinasikan dengan tim Security!` 
+  const message = isMalware
+    ? `Hasil scanning menunjukkan bahwa ${username} adalah MALWARE. Segera koordinasikan dengan tim Security!`
     : `Hasil scanning menunjukkan bahwa ${username} adalah Non-Malware (User Biasa/Spesial).`;
-  
+
   showAlert(message);
 });
 

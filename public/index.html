@@ -112,12 +112,16 @@
             <ul id="players" class="players"></ul>
           </article>
 
-          <!-- INGAME ONLY: Role & Avatar -->
-          <article id="roleArticle" class="panel-block ingame-only">
-            <h3>Role Kamu</h3>
-            <div class="role-display-box">
-              <div id="idleAvatar" class="idle-avatar"></div>
+          <!-- Chat (always visible) - NOW IN CENTER -->
+          <article class="panel-block">
+            <h3>Chat Operasi</h3>
+            <div id="chatBox" class="feed"></div>
+            <div class="chat-input">
+              <label for="chatInput" class="hidden">Pesan Chat</label>
+              <input id="chatInput" placeholder="Ketik pesan untuk tim..." maxlength="240" />
+              <button id="sendChatBtn">Kirim</button>
             </div>
+            <p class="field-note">Maksimal 240 karakter per pesan.</p>
           </article>
 
           <!-- INGAME ONLY: Action Panel -->
@@ -137,16 +141,12 @@
             </div>
           </article>
 
-          <!-- Chat (always visible) -->
-          <article class="panel-block">
-            <h3>Chat Operasi</h3>
-            <div id="chatBox" class="feed"></div>
-            <div class="chat-input">
-              <label for="chatInput" class="hidden">Pesan Chat</label>
-              <input id="chatInput" placeholder="Ketik pesan untuk tim..." maxlength="240" />
-              <button id="sendChatBtn">Kirim</button>
+          <!-- INGAME ONLY: Role & Avatar - MOVED TO END -->
+          <article id="roleArticle" class="panel-block ingame-only">
+            <h3>Role Kamu</h3>
+            <div class="role-display-box">
+              <div id="idleAvatar" class="idle-avatar"></div>
             </div>
-            <p class="field-note">Maksimal 240 karakter per pesan.</p>
           </article>
         </div>
 

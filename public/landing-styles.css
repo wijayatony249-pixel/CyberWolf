@@ -1,0 +1,807 @@
+/* ========================================
+   LANDING PAGE STYLES - CYBER TACTICAL
+   ======================================== */
+
+:root {
+    --landing-bg-dark: #020409;
+    --landing-bg-darker: #030610;
+    --landing-accent-cyan: #00ffff;
+    --landing-accent-blue: #0099ff;
+    --landing-panel-dark: #0a0f1a;
+    --landing-text-bright: #e0f0ff;
+    --landing-text-muted: #6a8aaa;
+    --landing-border: #1a3a5a;
+    --landing-border-strong: #00ccff;
+}
+
+/* TACTICAL GRID & SCANLINE OVERLAYS */
+.tactical-grid-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(0, 153, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 153, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.8;
+    mix-blend-mode: overlay;
+    z-index: -1;
+}
+
+.scanline-effect {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(to bottom,
+            rgba(255, 255, 255, 0.003) 0,
+            rgba(255, 255, 255, 0.003) 1px,
+            transparent 1px,
+            transparent 3px);
+    opacity: 0.4;
+    mix-blend-mode: overlay;
+    z-index: -1;
+}
+
+/* LANDING PAGE SHELL */
+.landing-shell {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0;
+    background: linear-gradient(135deg, var(--landing-bg-darker) 0%, var(--landing-bg-dark) 50%, #0b1425 100%);
+    min-height: 100vh;
+    position: relative;
+}
+
+/* ========================================
+   HERO SECTION - MAIN LANDING
+   ======================================== */
+
+.hero-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 30% 50%, rgba(0, 102, 204, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 70% 50%, rgba(0, 153, 255, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.tactical-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.network-grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(45deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(-45deg, rgba(0, 153, 255, 0.05) 1px, transparent 1px);
+    background-size: 80px 80px;
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 900px;
+    animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-branding {
+    margin-bottom: 40px;
+}
+
+.cyberwolf-logo {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    font-weight: 900;
+    color: var(--landing-accent-cyan);
+    text-shadow:
+        0 0 10px var(--landing-accent-cyan),
+        0 0 30px rgba(0, 153, 255, 0.5),
+        0 0 60px rgba(0, 102, 204, 0.3);
+    letter-spacing: 0.2em;
+    margin: 0;
+    line-height: 1;
+    word-spacing: 0.5em;
+}
+
+.hero-subtitle {
+    font-family: 'Exo 2', sans-serif;
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    color: var(--landing-accent-blue);
+    margin: 20px 0 0 0;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.hero-description {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.95rem;
+    color: var(--landing-text-muted);
+    line-height: 1.7;
+    margin: 30px 0;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    letter-spacing: 0.01em;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 50px 0;
+}
+
+.btn-primary,
+.btn-secondary {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 14px 40px;
+    border: 2px solid var(--landing-border-strong);
+    background: transparent;
+    color: var(--landing-accent-cyan);
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow:
+        0 0 10px rgba(0, 255, 255, 0.2),
+        inset 0 0 10px rgba(0, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 255, 255, 0.1);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: rgba(0, 255, 255, 0.1);
+    box-shadow:
+        0 0 20px rgba(0, 255, 255, 0.4),
+        inset 0 0 15px rgba(0, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    border-color: var(--landing-border);
+    color: var(--landing-text-muted);
+    box-shadow:
+        0 0 10px rgba(0, 153, 255, 0.15),
+        inset 0 0 10px rgba(0, 153, 255, 0.02);
+}
+
+.btn-secondary:hover {
+    border-color: var(--landing-accent-blue);
+    color: var(--landing-accent-blue);
+    box-shadow:
+        0 0 15px rgba(0, 153, 255, 0.3),
+        inset 0 0 10px rgba(0, 153, 255, 0.08);
+}
+
+.btn-bracket {
+    font-weight: 900;
+    opacity: 0.7;
+}
+
+.operation-status {
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 1px solid var(--landing-border);
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    flex-wrap: wrap;
+}
+
+.status-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.85rem;
+}
+
+.status-label {
+    color: var(--landing-text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-value {
+    color: var(--landing-accent-blue);
+    font-weight: 700;
+}
+
+.status-value.online {
+    color: #00ff00;
+    animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* ========================================
+   PANEL SECTIONS STYLING
+   ======================================== */
+
+.panel-section {
+    margin: 80px 20px;
+    padding: 60px 40px;
+    background: var(--landing-panel-dark);
+    border: 1px solid var(--landing-border);
+    border-left: 3px solid var(--landing-accent-cyan);
+    box-shadow:
+        0 0 30px rgba(0, 153, 255, 0.08),
+        inset 0 0 30px rgba(0, 153, 255, 0.03);
+    position: relative;
+}
+
+.panel-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    border-top: 2px solid var(--landing-border-strong);
+    border-left: 2px solid var(--landing-border-strong);
+    pointer-events: none;
+}
+
+.panel-section::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    border-bottom: 2px solid var(--landing-border-strong);
+    border-right: 2px solid var(--landing-border-strong);
+    pointer-events: none;
+}
+
+/* ========================================
+   SECTION HEADERS
+   ======================================== */
+
+.section-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.section-header h2 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    color: var(--landing-accent-cyan);
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    margin: 0 0 15px 0;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+}
+
+.header-divider {
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--landing-accent-cyan), transparent);
+    margin: 0 auto;
+}
+
+.section-intro {
+    text-align: center;
+    color: var(--landing-text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 40px;
+    line-height: 1.6;
+}
+
+/* ========================================
+   ABOUT GAME SECTION
+   ======================================== */
+
+.about-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.info-card {
+    background: rgba(10, 25, 50, 0.5);
+    border: 1px solid var(--landing-border);
+    padding: 30px;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.info-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.info-card:hover {
+    border-color: var(--landing-accent-blue);
+    background: rgba(0, 102, 204, 0.08);
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px rgba(0, 153, 255, 0.15);
+}
+
+.info-card:hover::before {
+    opacity: 1;
+}
+
+.card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.info-card h3 {
+    font-family: 'Exo 2', sans-serif;
+    color: var(--landing-accent-blue);
+    font-size: 1.2rem;
+    margin: 0 0 12px 0;
+    font-weight: 700;
+}
+
+.info-card p {
+    color: var(--landing-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ========================================
+   ROLE EXPLANATION SECTION
+   ======================================== */
+
+.roles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.role-card {
+    background: linear-gradient(135deg, rgba(10, 15, 30, 0.8), rgba(5, 20, 40, 0.8));
+    border: 2px solid var(--landing-border);
+    padding: 0;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.role-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.role-card:hover {
+    border-color: var(--landing-accent-cyan);
+    box-shadow:
+        0 0 20px rgba(0, 255, 255, 0.2),
+        inset 0 0 20px rgba(0, 255, 255, 0.05);
+    transform: translateY(-5px);
+}
+
+.role-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--landing-accent-cyan), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.role-card:hover::after {
+    opacity: 1;
+}
+
+.role-header {
+    background: rgba(10, 20, 40, 0.9);
+    padding: 25px;
+    border-bottom: 1px solid var(--landing-border);
+    position: relative;
+    z-index: 1;
+}
+
+.role-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.role-header h3 {
+    font-family: 'Orbitron', monospace;
+    color: var(--landing-accent-cyan);
+    font-size: 1.1rem;
+    margin: 10px 0;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+.role-faction {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 5px 12px;
+    border: 1px solid;
+    letter-spacing: 0.04em;
+    margin-top: 8px;
+}
+
+.role-faction.red {
+    background: rgba(255, 77, 109, 0.1);
+    border-color: #ff4d6d;
+    color: #ff6b8a;
+}
+
+.role-faction.blue {
+    background: rgba(0, 102, 204, 0.1);
+    border-color: var(--landing-accent-blue);
+    color: var(--landing-accent-blue);
+}
+
+.role-body {
+    padding: 25px;
+    position: relative;
+    z-index: 1;
+}
+
+.role-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 15px;
+    font-size: 0.85rem;
+}
+
+.role-stat:last-child {
+    margin-bottom: 0;
+}
+
+.stat-label {
+    color: var(--landing-text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-size: 0.75rem;
+}
+
+.stat-value {
+    color: var(--landing-text-bright);
+    line-height: 1.5;
+}
+
+.difficulty-high {
+    color: #ff6b8a;
+}
+
+.difficulty-med {
+    color: #ffaa00;
+}
+
+.difficulty-low {
+    color: #00ff00;
+}
+
+/* ========================================
+   FEATURES SECTION
+   ======================================== */
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+.feature-block {
+    background: rgba(5, 15, 30, 0.6);
+    border-left: 3px solid var(--landing-accent-blue);
+    padding: 25px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.feature-block:hover {
+    background: rgba(10, 30, 50, 0.8);
+    border-left-color: var(--landing-accent-cyan);
+    transform: translateX(5px);
+    box-shadow: 0 0 15px rgba(0, 153, 255, 0.15);
+}
+
+.feature-label {
+    font-family: 'Orbitron', monospace;
+    color: var(--landing-accent-cyan);
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: block;
+    letter-spacing: 0.03em;
+}
+
+.feature-block p {
+    color: var(--landing-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ========================================
+   HOW TO PLAY SECTION
+   ======================================== */
+
+.procedure-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    position: relative;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.procedure-timeline::before {
+    content: '';
+    position: absolute;
+    left: 50px;
+    top: 60px;
+    bottom: 60px;
+    width: 2px;
+    background: linear-gradient(180deg, transparent, var(--landing-accent-cyan), transparent);
+    z-index: 0;
+}
+
+.timeline-item {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    position: relative;
+    z-index: 1;
+}
+
+.timeline-number {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--landing-accent-cyan);
+    background: var(--landing-panel-dark);
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--landing-accent-cyan);
+    flex-shrink: 0;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.timeline-content h3 {
+    font-family: 'Exo 2', sans-serif;
+    color: var(--landing-accent-blue);
+    font-size: 1.2rem;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+}
+
+.timeline-content p {
+    color: var(--landing-text-muted);
+    margin: 0;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* ========================================
+   FOOTER
+   ======================================== */
+
+.landing-footer {
+    background: var(--landing-bg-darker);
+    border-top: 2px solid var(--landing-border);
+    padding: 50px 20px;
+    margin-top: 80px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.footer-top {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--landing-border);
+}
+
+.footer-top h4 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.3rem;
+    color: var(--landing-accent-cyan);
+    margin: 0 0 8px 0;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+}
+
+.footer-top p {
+    color: var(--landing-text-muted);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.footer-text {
+    font-family: 'Exo 2', sans-serif;
+    color: var(--landing-accent-blue);
+    font-size: 0.95rem;
+    margin: 15px 0 0 0;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.footer-credit {
+    color: var(--landing-text-muted);
+    font-size: 0.85rem;
+    margin: 8px 0 0 0;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 768px) {
+    .landing-shell {
+        padding: 0;
+    }
+
+    .hero-section {
+        min-height: auto;
+        padding: 40px 15px;
+    }
+
+    .cyberwolf-logo {
+        font-size: 2.5rem;
+        letter-spacing: 0.1em;
+        word-spacing: 0.3em;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .operation-status {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .panel-section {
+        margin: 50px 15px;
+        padding: 40px 20px;
+    }
+
+    .section-header h2 {
+        font-size: 1.8rem;
+    }
+
+    .about-grid,
+    .roles-grid,
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .procedure-timeline::before {
+        left: 35px;
+    }
+
+    .timeline-item {
+        gap: 20px;
+    }
+
+    .timeline-number {
+        width: 60px;
+        height: 60px;
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .cyberwolf-logo {
+        font-size: 1.8rem;
+        letter-spacing: 0.05em;
+    }
+
+    .hero-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .hero-description {
+        font-size: 0.85rem;
+    }
+
+    .panel-section {
+        padding: 25px 15px;
+    }
+
+    .section-header h2 {
+        font-size: 1.4rem;
+    }
+
+    .role-header,
+    .role-body {
+        padding: 15px;
+    }
+
+    .timeline-number {
+        width: 50px;
+        height: 50px;
+        font-size: 1rem;
+    }
+}
