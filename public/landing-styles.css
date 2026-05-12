@@ -503,6 +503,17 @@
     color: var(--landing-accent-blue);
 }
 
+.role-faction.yellow {
+    background: rgba(255, 170, 0, 0.1);
+    border-color: #ffaa00;
+    color: #ffcc00;
+}
+
+.role-card.neutral-team:hover {
+    border-color: #ffaa00;
+    box-shadow: 0 0 20px rgba(255, 170, 0, 0.2);
+}
+
 .role-body {
     padding: 25px;
     position: relative;
